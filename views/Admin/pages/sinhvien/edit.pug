@@ -1,0 +1,26 @@
+extends ../../layouts/default.pug
+
+block main
+  .container
+    h3.mb-4 Chỉnh sửa thông tin sinh viên
+    form(method="POST" action=`/${prefixAdmin}/sinhvien/edit/${sv._id}?_method=PATCH`)
+      .form-group
+        label Mã sinh viên
+        input.form-control(type="text" name="msvv" required value=sv.msvv)
+      .form-group
+        label Họ tên
+        input.form-control(type="text" name="ten" required value=sv.ten)
+      .form-group
+        label Lớp
+        input.form-control(type="text" name="lop" value=sv.lop)
+      .form-group
+        label Ngành
+        input.form-control(type="text" name="nganh" value=sv.nganh)
+      .form-group
+        label Email
+        input.form-control(type="email" name="email" value=sv.email)
+      .form-group
+        label Nhóm
+        input.form-control(type="text" name="group" value=sv.group)
+      button.btn.btn-warning.mt-3.text-white(type="submit") Cập nhật
+      a.btn.btn-secondary.mt-3.ms-2(href=`/${prefixAdmin}/sinhvien`) Quay lại

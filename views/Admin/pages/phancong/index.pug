@@ -1,0 +1,61 @@
+extends ../../layouts/default.pug
+
+block main
+  .container
+    h3.mb-3 Phân công hướng dẫn
+    table.table.table-bordered
+      thead.table-dark
+        tr
+          th Mã SV
+          th Tên
+          th Nhóm
+          th Giảng viên hướng dẫn
+          th Thao tác
+      tbody
+        each sv in sinhviens
+          tr
+            td= sv.msvv
+            td= sv.ten
+            td= sv.group
+            td
+              select.form-select(onchange=`phanCong('${sv._id}', this.value)`)
+                option(value="") -- Chọn giảng viên --
+                each gv in giangviens
+                  option(
+                    value=gv._id
+                    selected=(sv.supervisor && sv.supervisor._id.toString() === gv._id.toString())
+                  )= gv.hoten
+            td
+              if sv.supervisor
+                span.text-success Đã phân công
+              else
+                span.text-muted Chưa phân công
+
+  script.
+    async function phanCong(svid, gvid) {
+      if (!gvid) return;
+      const confirm = await Swal.fire({
+        title: "Xác nhận phân công?",
+        text: "Toàn bộ sinh viên cùng nhóm sẽ được gán giảng viên này.",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Phân công",
+        cancelButtonText: "Hủy"
+      });
+
+      if (!confirm.isConfirmed) return;
+
+      const res = await fetch("/admin/phancong/assign", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ svid, gvid })
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        await Swal.fire("Thành công", data.message, "success");
+        location.reload();
+      } else {
+        Swal.fire("Lỗi", data.message, "error");
+      }
+    }

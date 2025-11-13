@@ -1,0 +1,68 @@
+extends ../../layouts/default.pug
+
+block main
+  .container-fluid
+    .d-flex.justify-content-between.align-items-center.mb-3
+      h3.mb-0 Quản lý giảng viên
+      form(method="post" action="/admin/giangvien/import" enctype="multipart/form-data" class="mb-3")
+        .form-row
+          .col-md-6
+            input.form-control(type="file" name="excelFile" accept=".xls,.xlsx" required)
+          .col-md-3
+            button.btn.btn-success(type="submit") Import từ Excel
+          .col-md-3.text-right
+            a.btn.btn-primary(href="/admin/giangvien/create") +Add giangvien
+
+
+    form.form-inline.mb-3(method="GET", action="")
+      input.form-control.mr-2(type="text", name="keyword", placeholder="Tìm kiếm", value=keyword)
+      button.btn.btn-outline-success(type="submit") Tìm kiếm
+
+    if giangviens && giangviens.length
+      table.table.table-striped.table-bordered.table-hover
+        thead.table-dark
+          tr
+            th(scope="col") #
+            th(scope="col") Mã giảng viên
+            th(scope="col") Họ tên
+            th(scope="col") Email
+            th(scope="col") Vai trò
+            th(scope="col" style="width: 120px") Thao tác
+        tbody
+          each gv, index in giangviens
+            tr
+              td #{index + 1}
+              td #{gv.magv}
+              td #{gv.hoten}
+              td #{gv.email}
+              td
+                if gv.roles && gv.roles.length
+                  each role in gv.roles
+                    span.badge.bg-info.text-dark.mr-1 #{role}
+                else
+                  span.text-muted (Chưa có vai trò)
+              td.text-center
+                a.btn.btn-sm.btn-warning.text-white(href=`/${prefixAdmin}/giangvien/edit/${gv._id}`) Sửa
+                button.btn.btn-sm.btn-danger.btn-delete(data-id=gv._id type="button") Xóa
+    else
+      p.text-muted.text-center.mt-4 Không có giảng viên nào.
+
+  script.
+    const prefixAdmin = '!{prefixAdmin}';
+    document.querySelectorAll('.btn-delete').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const id = btn.getAttribute('data-id');
+        const confirm = await Swal.fire({
+          title: 'Xóa giảng viên?',
+          text: 'Bạn chắc chắn muốn xóa giảng viên này?',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Xóa',
+          cancelButtonText: 'Hủy'
+        });
+        if (confirm.isConfirmed) {
+          await fetch(`/${prefixAdmin}/giangvien/delete/${id}`, { method: 'DELETE' });
+          location.reload();
+        }
+      });
+    });

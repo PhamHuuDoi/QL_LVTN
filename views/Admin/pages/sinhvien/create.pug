@@ -1,0 +1,26 @@
+extends ../../layouts/default.pug
+
+block main
+  .container
+    h3.mb-4 Thêm mới sinh viên
+    form(method="POST" action=`/${prefixAdmin}/sinhvien/create`)
+      .form-group
+        label Mã sinh viên
+        input.form-control(type="text" name="msvv" required)
+      .form-group
+        label Họ tên
+        input.form-control(type="text" name="ten" required)
+      .form-group
+        label Lớp
+        input.form-control(type="text" name="lop")
+      .form-group
+        label Ngành
+        input.form-control(type="text" name="nganh")
+      .form-group
+        label Email
+        input.form-control(type="email" name="email")
+      .form-group
+        label Nhóm
+        input.form-control(type="text" name="group")
+      button.btn.btn-success.mt-3(type="submit") Lưu lại
+      a.btn.btn-secondary.mt-3.ms-2(href=`/${prefixAdmin}/sinhvien`) Quay lại

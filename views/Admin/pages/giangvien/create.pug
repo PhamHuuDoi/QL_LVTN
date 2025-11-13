@@ -1,0 +1,17 @@
+extends ../../layouts/default.pug
+
+block main
+  .container
+    h3.mb-4 Thêm mới sinh viên
+    form(method="POST" action=`/${prefixAdmin}/giangvien/create`)
+      .form-group
+        label Mã giảng viên
+        input.form-control(type="text" name="magv" required)
+      .form-group
+        label Họ tên
+        input.form-control(type="text" name="hoten" required)
+      .form-group
+        label Email
+        input.form-control(type="email" name="email")
+      button.btn.btn-success.mt-3(type="submit") Lưu lại
+      a.btn.btn-secondary.mt-3.ms-2(href=`/${prefixAdmin}/giangvien`) Quay lại
