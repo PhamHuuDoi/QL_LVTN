@@ -37,7 +37,7 @@ app.use(flash());
 // Gắn prefix admin
 app.locals.prefixAdmin = systemConfig.prefixAdmin;
 app.use(`/${systemConfig.prefixAdmin}`, routeAdmin);
-
+//
 // View engine
 app.set("views", `${__dirname}/views`);
 app.set("view engine", "pug");
