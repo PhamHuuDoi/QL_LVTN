@@ -1,4 +1,4 @@
-const Sinhvien = require("../../models/sinhvien.model");
+const Sinhvien = require("../../models/sinhVien.model");
 const GV = require("../../models/giangVien.model");
 const path = require("path");
 const xlsx = require("xlsx");

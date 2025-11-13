@@ -1,5 +1,5 @@
 // controllers/admin/giangvien.controller.js
-const GV = require("../../models/giangvien.model");
+const GV = require("../../models/giangVien.model");
 const xlsx = require("xlsx");
 const fs = require("fs");
 

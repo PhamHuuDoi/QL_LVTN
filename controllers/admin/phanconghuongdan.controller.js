@@ -1,5 +1,5 @@
-const SinhVien = require("../../models/sinhvien.model");
-const GiangVien = require("../../models/giangvien.model");
+const SinhVien = require("../../models/sinhVien.model");
+const GiangVien = require("../../models/giangVien.model");
 
 // [GET] /admin/phancong
 module.exports.index = async (req, res) => {
