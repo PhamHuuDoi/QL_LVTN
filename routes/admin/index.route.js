@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
+
 // Import route con
 const sinhvienRoute = require("./sinhvien.route");
 const dashboardRoute = require("./dashboard.route");

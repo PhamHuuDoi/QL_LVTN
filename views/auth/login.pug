@@ -1,0 +1,21 @@
+
+extends ./layouts/default.pug
+
+block main
+  .container.my-5
+    .row.justify-content-center
+      .col-md-6
+        h2.text-center.mb-4 Đăng nhập
+
+        //- Hiển thị lỗi nếu có
+        if error
+          .alert.alert-danger #{error}
+
+        form(method="POST", action="/login")
+          .form-group
+            label(for="username") Tên đăng nhập
+            input#username.form-control(type="text", name="username", required, placeholder="Nhập tên đăng nhập")
+          .form-group
+            label(for="password") Mật khẩu
+            input#password.form-control(type="password", name="password", required, placeholder="Nhập mật khẩu")
+          button.btn.btn-primary.btn-block(type="submit") Đăng nhập

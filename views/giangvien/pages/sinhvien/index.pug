@@ -1,0 +1,70 @@
+extends ../../layouts/default.pug
+
+block main
+  .container-fluid
+    .d-flex.justify-content-between.align-items-center.mb-3
+      h3.mb-0 Danh sách sinh viên được phân công
+
+    // 🔍 Form tìm kiếm + lọc nhóm (CHỈ GỬI QUERY, KO XỬ LÝ)
+    form.form-inline.mb-3(method="GET", action="")
+      input.form-control.mr-2(
+        type="text"
+        name="keyword"
+        placeholder="Tìm theo tên hoặc MSSV"
+        value=keyword
+      )
+      select.form-control.mr-2(name="filterGroup")
+        option(value="") -- Lọc theo nhóm --
+        option(value="none" selected=(filterGroup=="none")) Chưa có nhóm
+        option(value="single" selected=(filterGroup=="single")) Nhóm 1 sinh viên
+        option(value="full" selected=(filterGroup=="full")) Nhóm đủ 2 sinh viên
+      button.btn.btn-outline-success(type="submit") Lọc
+
+    if sinhviens.length
+      table.table.table-striped.table-bordered.table-hover
+        thead.table-dark
+          tr
+            th #
+            th Mã SV
+            th Họ tên
+            th Lớp
+            th Ngành
+            th Email
+            th Nhóm
+            th(width="160") Thay đổi nhóm
+        tbody
+          each sv, index in sinhviens
+            tr
+              td #{index + 1}
+              td #{sv.msvv}
+              td #{sv.ten}
+              td #{sv.lop}
+              td #{sv.nganh}
+              td #{sv.email}
+              td #{sv.group || 'Chưa có'}
+
+              td
+                form(method="POST", action=`/giangvien/sinhvien/update-group/${sv._id}`)
+                  .input-group
+                    input.form-control(
+                      type="number"
+                      min="1"
+                      max="99"
+                      name="group"
+                      value=sv.group
+                      placeholder="Nhập nhóm"
+                    )
+                    .input-group-append
+                      button.btn.btn-primary(type="submit") Lưu
+
+    else
+      p.text-muted.text-center.mt-4 Không có sinh viên nào.
+
+  // SweetAlert thông báo
+  if success
+    script.
+      Swal.fire('Thành công', '#{success}', 'success');
+
+  if error
+    script.
+      Swal.fire('Lỗi', '#{error}', 'error');

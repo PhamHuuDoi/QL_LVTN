@@ -1,5 +1,7 @@
 // controllers/admin/giangvien.controller.js
 const GV = require("../../models/giangVien.model");
+const Account = require("../../models/acount.model");
+const md5 = require("md5");
 const xlsx = require("xlsx");
 const fs = require("fs");
 
@@ -48,18 +50,28 @@ module.exports.index = async (req, res) => {
 // [GET] /admin/giangvien/create
 module.exports.create = (req, res) => {
   res.render("admin/pages/giangvien/create", {
-    pageTitle: "Thêm giảng viên"
+    pageTitle: "Thêm giảng viên",
+    prefixAdmin: "admin",
   });
 };
 
 // [POST] /admin/giangvien/create
 module.exports.createPost = async (req, res) => {
   try {
-    await GV.create(req.body);
-    req.flash("success", "Thêm giảng viên thành công!");
+    const newGV = await GV.create(req.body);
+
+    await Account.create({
+      username: newGV.magv,
+      password: md5(newGV.magv),
+      role: "giangvien",
+      giangvienId: newGV._id
+    });
+
+    req.flash("success", "Thêm giảng viên + tài khoản thành công!");
     res.redirect("/admin/giangvien");
   } catch (err) {
-    req.flash("error", "Lỗi khi thêm giảng viên: " + err.message);
+    console.error(err);
+    req.flash("error", "Lỗi khi tạo giảng viên!");
     res.redirect("/admin/giangvien");
   }
 };
@@ -88,8 +100,15 @@ module.exports.editPost = async (req, res) => {
 // [DELETE] /admin/giangvien/delete/:id
 module.exports.delete = async (req, res) => {
   try {
-    await GV.deleteOne({ _id: req.params.id });
-    res.json({ success: true, message: "Xóa giảng viên thành công!" });
+    const gvId = req.params.id;
+
+    // Xóa giảng viên
+    await GV.deleteOne({ _id: gvId });
+
+    // Xóa luôn tài khoản tương ứng
+    await Account.deleteOne({ giangvienId: gvId });
+
+    res.json({ success: true, message: "Xóa giảng viên + tài khoản thành công!" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, message: "Lỗi khi xóa giảng viên!" });
@@ -108,7 +127,9 @@ module.exports.importExcel = async (req, res) => {
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     const rows = xlsx.utils.sheet_to_json(sheet);
 
-    const giangviens = rows.map((r) => {
+    const giangviens = [];
+
+    for (const r of rows) {
       const normalized = {};
       for (let key in r) {
         const cleanKey = removeDiacritics(key);
@@ -124,17 +145,25 @@ module.exports.importExcel = async (req, res) => {
       const ten = normalized["ten"] || "";
       const hoTen = (ho + " " + ten).trim() || normalized["ho ten"] || "";
 
-      return {
-        magv: normalized["magv"] || normalized["ma giang vien"] || "",
-        hoten: hoTen,
-        email: normalized["email"] || "",
-      };
-    });
+      const magv = normalized["magv"] || normalized["ma giang vien"] || "";
+      const email = normalized["email"] || "";
 
-    await GV.insertMany(giangviens);
+      // Tạo giảng viên
+      const newGV = await GV.create({ magv, hoten: hoTen, email });
+
+      // Tạo tài khoản tương ứng
+      await Account.create({
+        username: magv,
+        password: md5(magv),
+        role: "giangvien",
+        giangvienId: newGV._id,
+      });
+
+      giangviens.push(newGV);
+    }
+
     fs.unlinkSync(req.file.path);
-
-    req.flash("success", "Import danh sách giảng viên thành công!");
+    req.flash("success", "Import danh sách giảng viên + tạo tài khoản thành công!");
     res.redirect("/admin/giangvien");
   } catch (err) {
     console.error("❌ Lỗi import Excel:", err);
