@@ -1,6 +1,6 @@
 const DeTai = require("../../models/detai.model");
 const GiangVien = require("../../models/giangVien.model");
-const PhanCongPB = require("../../models/phanCongPhanBien.model");
+const PhanCongPB = require("../../models/phancongphanbien.model");
 
 module.exports.index = async (req, res) => {
   try {
@@ -16,18 +16,18 @@ module.exports.index = async (req, res) => {
       .lean();
 
     // Gắn phân công PB & group cho từng đề tài
-    detais.forEach(dt => {
+    detais.forEach((dt) => {
       // Lấy phân công PB nếu có
-      dt.phanbien = phanbiens.find(
-        pb => pb.detai_id.toString() === dt._id.toString()
-      ) || null;
+      dt.phanbien =
+        phanbiens.find((pb) => pb.detai_id.toString() === dt._id.toString()) ||
+        null;
 
       // trả về nhóm
       dt.group = dt.sv1?.group || dt.sv2?.group || "—";
 
       // Dropdown GV PB (loại GVHD)
-      dt.availablePB = giangviens.filter(gv =>
-        gv._id.toString() !== dt.giangvien_id?._id?.toString()
+      dt.availablePB = giangviens.filter(
+        (gv) => gv._id.toString() !== dt.giangvien_id?._id?.toString()
       );
     });
 
@@ -37,15 +37,12 @@ module.exports.index = async (req, res) => {
       success: req.flash("success"),
       error: req.flash("error"),
     });
-
   } catch (err) {
     console.error("❌ Lỗi list:", err);
     req.flash("error", "Không tải được danh sách phân công!");
     res.redirect("/admin");
   }
 };
-
-
 
 // =============================
 // XỬ LÝ PHÂN CÔNG / CẬP NHẬT PHẢN BIỆN
@@ -79,14 +76,13 @@ module.exports.assign = async (req, res) => {
 
     return res.json({
       success: true,
-      message: "Cập nhật phân công phản biện thành công!"
+      message: "Cập nhật phân công phản biện thành công!",
     });
-
   } catch (err) {
     console.error("❌ Lỗi assign:", err);
     return res.json({
       success: false,
-      message: "Không thể phân công!"
+      message: "Không thể phân công!",
     });
   }
 };
