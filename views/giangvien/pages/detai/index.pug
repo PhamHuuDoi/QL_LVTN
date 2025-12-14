@@ -1,0 +1,36 @@
+extends ../../layouts/default.pug
+
+block main
+  - pageTitle = "Quản lý Đề tài"
+
+  .container.mt-4
+    h2.mb-4.text-primary Quản lý Đề tài
+
+    table.table.table-bordered.table-hover
+      thead.bg-light
+        tr
+          th Nhóm
+          th Thành viên 1
+          th Thành viên 2
+          th Tên đề tài
+          th Hành động
+
+      tbody
+        each row in rows
+          tr
+            td #{row.group}
+            td #{row.sv1 ? `${row.sv1.ten} (${row.sv1.msvv})` : ""}
+            td #{row.sv2 ? `${row.sv2.ten} (${row.sv2.msvv})` : ""}
+
+            if row.detai
+              td #{row.detai.ten}
+            else
+              td.text-muted Chưa có đề tài
+
+            td
+              if row.detai
+                a.btn.btn-info.btn-sm(href=`/giangvien/detai/detail/${row.detai._id}`) Chi tiết
+                a.btn.btn-warning.btn-sm(href=`/giangvien/detai/edit/${row.detai._id}`) Sửa
+                a.btn.btn-secondary.btn-sm(href=`/giangvien/detai/export/${row.detai._id}` target="_blank") Export
+              else
+                a.btn.btn-success.btn-sm(href=`/giangvien/detai/create?group=${row.group}`) + Tạo đề tài

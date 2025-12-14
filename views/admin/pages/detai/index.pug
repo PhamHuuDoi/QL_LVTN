@@ -1,0 +1,40 @@
+extends ../../layouts/default.pug
+
+block main
+  .container.mt-4
+    h2.text-primary Danh sách đề tài
+
+    table.table.table-bordered.table-hover
+      thead.thead-dark
+        tr
+          th Nhóm
+          th Tên SV1
+          th MSSV1
+          th Tên SV2
+          th MSSV2
+          th Giảng viên HD
+          th Tên đề tài
+          th Xem chi tiết
+
+      tbody
+        each dt in detais
+          tr
+            td #{dt.group || "Không có"}
+
+            // SV1
+            td #{dt.sv1 ? dt.sv1.ten : "Không có"}
+            td #{dt.sv1 ? dt.sv1.msvv : "-"}
+
+            // SV2
+            td #{dt.sv2 ? dt.sv2.ten : "Không có"}
+            td #{dt.sv2 ? dt.sv2.msvv : "-"}
+
+            // GVHD
+            td #{dt.giangvien_id ? dt.giangvien_id.hoten : "Không có"}
+
+            // Đề tài
+            td #{dt.ten}
+
+            // Link xem chi tiết
+            td 
+              a.btn.btn-info.btn-sm(href=`/admin/detai/detail/${dt._id}`) Xem

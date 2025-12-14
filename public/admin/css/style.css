@@ -50,14 +50,18 @@
 
 /* show-alert */
 .show-alert {
-  position: fixed;
-  top: 70px;
-  right: 20px;
-  z-index: 999;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 12px 18px;
+    border-radius: 6px;
+    z-index: 9999;
+    opacity: 1;
+    transition: opacity 0.5s ease-out;
 }
 
-.show-alert.hidden {
-  display: none;
+.show-alert.hide {
+    opacity: 0;
 }
 /* End show-alert */
 

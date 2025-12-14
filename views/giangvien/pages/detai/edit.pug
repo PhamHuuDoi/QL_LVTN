@@ -1,0 +1,73 @@
+extends ../../layouts/default.pug
+
+block main
+  .container.mt-4
+    h3.text-primary Chỉnh sửa đề tài
+
+    form(method="POST", action=`/giangvien/detai/edit/${detai._id}`)
+      
+      // Sinh viên — READONLY
+      hr
+      h5.text-info Thông tin sinh viên
+
+      .row
+        .col-md-6
+          .form-group
+            label Sinh viên 1
+            input.form-control(type="text", readonly value=`${detai.sv1.ten} (${detai.sv1.msvv})`)
+
+        .col-md-6
+          .form-group
+            label Sinh viên 2
+            if detai.sv2
+              input.form-control(type="text", readonly value=`${detai.sv2.ten} (${detai.sv2.msvv})`)
+            else
+              input.form-control(type="text", readonly value="Không có")
+
+      hr
+
+      h5.text-info Giảng viên hướng dẫn
+      .form-group
+        input.form-control(type="text", readonly value=`${detai.giangvien_id.hoten} (${detai.giangvien_id.magv})`)
+
+      hr
+
+      // THÔNG TIN ĐỀ TÀI — CÓ THỂ SỬA
+      h5.text-info Thông tin đề tài
+
+      .form-group
+        label Tên đề tài
+        input.form-control(type="text", name="ten", value=detai.ten, required)
+
+      .form-group
+        label Mô tả đề tài
+        textarea.form-control(name="mota" rows="3")= detai.mota || ""
+
+      .form-group
+        label Nhiệm vụ (mỗi nhiệm vụ 1 dòng)
+        textarea.form-control(name="nhiemvu" rows="4")= detai.nhiemvu ? detai.nhiemvu.join("\n") : ""
+
+      .form-group
+        label Ngày giao
+        input.form-control(
+          type="date",
+          name="ngaygiao",
+          value=(detai.ngaygiao ? detai.ngaygiao.toISOString().slice(0,10) : "")
+        )
+
+      .form-group
+        label Ngày hoàn thành dự kiến
+        input.form-control(
+          type="date",
+          name="ngayhoanthanh",
+          value=(detai.ngayhoanthanh ? detai.ngayhoanthanh.toISOString().slice(0,10) : "")
+        )
+
+      .form-group
+        label Trạng thái
+        select.form-control(name="trangthai")
+          option(value="Đang hướng dẫn" selected=(detai.trangthai==="Đang hướng dẫn")) Đang hướng dẫn
+          option(value="Hoàn thành" selected=(detai.trangthai==="Hoàn thành")) Hoàn thành
+
+      button.btn.btn-primary.mt-3(type="submit") Cập nhật đề tài
+      a.btn.btn-secondary.mt-3(href="/giangvien/detai") Quay lại

@@ -1,0 +1,30 @@
+extends ../../layouts/default.pug
+
+block main
+  h3.text-primary ĐÁNH GIÁ GIỮA KỲ
+
+  table.table.table-bordered
+    thead
+      tr
+        th MSSV
+        th Họ tên
+        th Lớp
+        th Đề tài
+        th Nhóm
+        th Điểm giữa kỳ
+        th Kết quả
+        th Hành động
+
+    tbody
+      each row in rows
+        tr
+          td= row.sv.msvv
+          td= row.sv.ten
+          td= row.sv.lop
+          td= row.detai ? row.detai.ten : "Chưa có"
+          td= row.sv.group || ""
+          td= row.dg ? row.dg.diem + "%" : "Chưa có"
+          td= row.dg ? row.dg.ketqua : "Chưa đánh giá"
+          td
+            a.btn.btn-sm.btn-info(href=`/giangvien/danhgiagk/form/${row.sv._id}`)
+              | #{row.dg ? "Sửa" : "Đánh giá"}

@@ -1,0 +1,64 @@
+extends ../../layouts/default.pug
+
+block main
+  .container.mt-4
+    h3.text-primary Tạo đề tài cho nhóm #{group}
+
+    form(method="POST", action="/giangvien/detai/create")
+      // Hidden fields
+      input(type="hidden", name="sv1", value=(sv1 ? sv1._id : ""))
+      input(type="hidden", name="sv2", value=(sv2 ? sv2._id : ""))
+
+      hr
+
+      h5.text-info Thông tin sinh viên
+
+      .row
+        .col-md-6
+          .form-group
+            label Sinh viên 1
+            if sv1
+              input.form-control(type="text", value=`${sv1.ten} (${sv1.msvv})`, readonly)
+            else
+              input.form-control(type="text", value="Không có sinh viên", readonly)
+
+        .col-md-6
+          .form-group
+            label Sinh viên 2
+            if sv2
+              input.form-control(type="text", value=`${sv2.ten} (${sv2.msvv})`, readonly)
+            else
+              input.form-control(type="text", value="Không có sinh viên thứ 2", readonly)
+
+      hr
+
+      h5.text-info Giảng viên hướng dẫn
+      .form-group
+        input.form-control(type="text", readonly value=`${gv.hoten} (${gv.magv})`)
+
+      hr
+
+      h5.text-info Thông tin đề tài
+
+      .form-group
+        label Tên đề tài
+        input.form-control(type="text", name="ten", required)
+
+      .form-group
+        label Mô tả đề tài
+        textarea.form-control(name="mota" rows="3")
+
+      .form-group
+        label Nhiệm vụ (mỗi nhiệm vụ 1 dòng)
+        textarea.form-control(name="nhiemvu" rows="4")
+
+      .form-group
+        label Ngày giao
+        input.form-control(type="date", name="ngaygiao", value=today)
+
+      .form-group
+        label Ngày hoàn thành dự kiến
+        input.form-control(type="date", name="ngayhoanthanh")
+
+      button.btn.btn-success.mt-3(type="submit") Tạo đề tài
+      a.btn.btn-secondary.mt-3(href="/giangvien/detai") Quay lại

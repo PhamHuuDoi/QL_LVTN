@@ -1,0 +1,65 @@
+extends ../../layouts/default.pug
+
+block main
+  h3.text-primary Đánh giá giữa kỳ
+
+  form(method="POST", action="/giangvien/danhgiagk/save")
+    input(type="hidden", name="sv_id", value=sv._id)
+    input(type="hidden", name="detai_id", value=(detai ? detai._id : ""))
+
+    .form-group
+      label Sinh viên
+      input.form-control(
+        type="text",
+        readonly,
+        value=`${sv.ten} (${sv.msvv})`
+      )
+
+    .form-group
+      label Đề tài
+      input.form-control(
+        type="text",
+        readonly,
+        value=(detai ? detai.ten : "Chưa có")
+      )
+
+    .form-group
+      label Điểm giữa kỳ (%)
+      input.form-control(
+        type="number",
+        name="diem",
+        min="0",
+        max="100",
+        value=(dg && dg.diem ? dg.diem : "")
+      )
+
+    .form-group
+      label Kết quả
+      select.form-control(name="ketqua")
+        option(
+          value="Làm tiếp",
+          selected=(dg && dg.ketqua === "Làm tiếp")
+        ) Làm tiếp
+
+        option(
+          value="Cảnh cáo",
+          selected=(dg && dg.ketqua === "Cảnh cáo")
+        ) Cảnh cáo
+
+        option(
+          value="Đình chỉ",
+          selected=(dg && dg.ketqua === "Đình chỉ")
+        ) Đình chỉ
+
+        option(
+          value="Chưa đánh giá",
+          selected=(!dg || dg.ketqua === "Chưa đánh giá")
+        ) Chưa đánh giá
+
+    .form-group
+      label Nhận xét
+      textarea.form-control(name="nhanxet")
+        | #{dg && dg.nhanxet ? dg.nhanxet : ""}
+
+    button.btn.btn-success(type="submit") Lưu đánh giá
+    a.btn.btn-secondary(href="/giangvien/danhgiagk") Quay lại

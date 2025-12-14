@@ -62,7 +62,6 @@ app.get("/", (req, res) => {
 
     return res.redirect("/login");
 });
-
 // Khởi động server
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);

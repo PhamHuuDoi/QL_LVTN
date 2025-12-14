@@ -22,7 +22,7 @@ module.exports.index = async (req, res) => {
   } else if (filterGroup === "single") {
     filter.group = { $exists: true };
     // Nhóm chỉ 1 thành viên
-    // Chúng ta cần đếm số lượng trong mỗi nhóm -> Mongoose aggregate
+    // Đếm số lượng trong mỗi nhóm -> Mongoose aggregate
     const sinhviensAll = await Sinhvien.find(filter);
     const groupCounts = {};
     sinhviensAll.forEach(sv => {

@@ -1,7 +1,7 @@
 mixin alert-success(time, messages)
-  - if (messages && messages.success)
-    div.alert.alert-success.show-alert(show-alert=time) #{messages.success}
+  if messages && messages.success
+    div.alert.alert-success.show-alert(data-time=time)= messages.success
 
 mixin alert-error(time, messages)
-  - if (messages && messages.error)
-    div.alert.alert-danger.show-alert(show-alert=time) #{messages.error}
+  if messages && messages.error
+    div.alert.alert-danger.show-alert(data-time=time)= messages.error

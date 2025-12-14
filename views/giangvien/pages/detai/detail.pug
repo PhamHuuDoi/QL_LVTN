@@ -1,0 +1,57 @@
+extends ../../layouts/default.pug
+
+block main
+  - pageTitle = "Chi tiết Đề tài"
+
+  .container.mt-4
+    h2.mb-4.text-primary Chi tiết Đề tài
+
+    table.table.table-bordered
+      tr
+        th Tên đề tài
+        td #{detai.ten}
+
+      tr
+        th Mô tả
+        td #{detai.mota}
+
+      tr
+        th Nhiệm vụ
+        td.pre-line
+          each nv in detai.nhiemvu
+            | • #{nv}
+            br
+
+      tr
+        th Giảng viên hướng dẫn
+        td #{detai.giangvien_id.hoten} (#{detai.giangvien_id.magv})
+
+      tr
+        th Sinh viên 1
+        td #{detai.sv1.ten} (#{detai.sv1.msvv})
+
+      tr
+        th Sinh viên 2
+        if detai.sv2
+          td #{detai.sv2.ten} (#{detai.sv2.msvv})
+        else
+          td.text-muted Không có
+
+      tr
+        th Ngày giao
+        td #{detai.ngaygiao ? detai.ngaygiao.toLocaleDateString("vi-VN") : ""}
+
+      tr
+        th Ngày hoàn thành
+        td #{detai.ngayhoanthanh ? detai.ngayhoanthanh.toLocaleDateString("vi-VN") : ""}
+
+      tr
+        th Trạng thái
+        td
+          if detai.trangthai == "Đang hướng dẫn"
+            span.badge.badge-warning Đang hướng dẫn
+          else
+            span.badge.badge-success Hoàn thành
+
+    a.btn.btn-secondary.mt-3(href="/giangvien/detai") Quay lại
+    a.btn.btn-success.mt-3(href=`/giangvien/detai/export/${detai._id}`) Xuất Word

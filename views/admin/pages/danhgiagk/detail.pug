@@ -1,0 +1,40 @@
+extends ../../layouts/default.pug
+
+block main
+  .container.mt-4
+    h3.text-primary Chi tiết đánh giá giữa kỳ
+
+    table.table.table-bordered
+      tr
+        th Sinh viên
+        td #{dg.sv_id.ten} (#{dg.sv_id.msvv})
+
+      tr
+        th Lớp
+        td #{dg.sv_id.lop}
+
+      tr
+        th Nhóm
+        td #{dg.sv_id.group}
+
+      tr
+        th Đề tài
+        td #{dg.detai_id?.ten || "Chưa có"}
+
+      tr
+        th Điểm giữa kỳ
+        td #{dg.diem != null ? dg.diem + "%" : "Chưa đánh giá"}
+
+      tr
+        th Kết quả
+        td #{dg.ketqua}
+
+      tr
+        th Nhận xét
+        td.pre-line #{dg.nhanxet || "—"}
+
+      tr
+        th Giảng viên đánh giá
+        td #{dg.giangvien_id?.hoten} (#{dg.giangvien_id?.magv})
+
+    a.btn.btn-secondary.mt-3(href="/admin/danhgia-gk") Quay lại

@@ -15,6 +15,8 @@ module.exports.index = async (req, res) => {
       prefixAdmin: "admin",
       sinhviens,
       giangviens,
+      success: req.flash("success"),
+      error: req.flash("error"),
     });
   } catch (err) {
     console.error(err);
