@@ -16,7 +16,7 @@ const list = async (req, res) => {
     let gvId = req.session.user?._id;
     if (!gvId) {
       req.flash("error", "Không xác định được giảng viên!");
-      return res.redirect("back");
+      return res.redirect("/giangvien/detai");
     }
 
     gvId = gvId.toString();
@@ -62,7 +62,7 @@ const list = async (req, res) => {
   } catch (err) {
     console.error(" Lỗi list:", err);
     req.flash("error", "Có lỗi xảy ra khi tải danh sách!");
-    res.redirect("back");
+    res.redirect("/giangvien/detai");
   }
 };
 
@@ -118,7 +118,7 @@ const create = async (req, res) => {
       sv2: req.body.sv2 || null,
       ngaygiao: req.body.ngaygiao || null,
       ngayhoanthanh: req.body.ngayhoanthanh || null,
-      trangthai: "Chưa duyệt",
+      trangthai: "Đang hướng dẫn",
     });
 
     req.flash("success", "Tạo đề tài thành công!");
@@ -126,7 +126,7 @@ const create = async (req, res) => {
   } catch (err) {
     console.error(" Lỗi tạo:", err);
     req.flash("error", "Không thể tạo đề tài!");
-    res.redirect("back");
+    res.redirect("/giangvien/detai");
   }
 };
 
@@ -180,7 +180,7 @@ const update = async (req, res) => {
   } catch (err) {
     console.error("Lỗi update:", err);
     req.flash("error", "Cập nhật thất bại!");
-    res.redirect("back");
+    res.redirect("/giangvien/detai");
   }
 };
 

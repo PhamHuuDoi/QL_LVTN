@@ -44,9 +44,8 @@ module.exports.index = async (req, res) => {
 
 // [GET] /admin/sinhvien/create
 module.exports.create = (req, res) => {
-  
   res.render("admin/pages/sinhvien/create", {
-    pageTitle: "Thêm sinh viên"
+    pageTitle: "Thêm sinh viên",
   });
 };
 
@@ -58,7 +57,7 @@ module.exports.createPost = async (req, res) => {
     res.redirect("/admin/sinhvien");
   } catch (err) {
     req.flash("error", "Lỗi khi thêm sinh viên: " + err.message);
-    res.redirect("back");
+    res.redirect("/admin/sinhvien");
   }
 };
 
@@ -67,7 +66,7 @@ module.exports.edit = async (req, res) => {
   const sv = await Sinhvien.findById(req.params.id);
   res.render("admin/pages/sinhvien/edit", {
     pageTitle: "Sửa sinh viên",
-    sv
+    sv,
   });
 };
 
@@ -151,7 +150,7 @@ module.exports.importExcel = async (req, res) => {
     req.flash("success", "Import danh sách sinh viên thành công!");
     res.redirect("/admin/sinhvien");
   } catch (err) {
-    console.error("❌ Lỗi import Excel:", err);
+    console.error(" Lỗi import Excel:", err);
     req.flash("error", "Lỗi khi import Excel!");
     res.redirect("/admin/sinhvien");
   }

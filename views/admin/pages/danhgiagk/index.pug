@@ -12,9 +12,9 @@ block main
           th Lớp
           th Nhóm
           th Đề tài
+          th Giảng viên đánh giá
           th Điểm GK
           th Kết quả
-          th Giảng viên đánh giá
           th Xem
 
       tbody
@@ -26,7 +26,7 @@ block main
             td= dg.sv_id && dg.sv_id.group ? dg.sv_id.group : "—"
 
             td= dg.detai_id ? dg.detai_id.ten : "Chưa có"
-
+            td= dg.giangvien_id ? dg.giangvien_id.hoten : "—"
             td 
               if dg.diem != null
                 | #{dg.diem} %
@@ -34,8 +34,6 @@ block main
                 span.text-muted Chưa đánh giá
 
             td= dg.ketqua
-
-            td= dg.giangvien_id ? dg.giangvien_id.hoten : "—"
 
             td
               a.btn.btn-sm.btn-info(href=`/admin/danhgiagk/detail/${dg._id}`) Xem

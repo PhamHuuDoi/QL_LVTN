@@ -1,0 +1,30 @@
+extends ../../layouts/default.pug
+
+block main
+  h3.text-primary NHẬP ĐIỂM HƯỚNG DẪN
+
+  table.table.table-bordered
+    thead
+      tr
+        th MSSV
+        th Họ tên
+        th Lớp
+        th Đề tài
+        th Nhóm
+        th Điểm HD
+        th Hành động
+    tbody
+      each row in rows
+        tr
+          td= row.sv.msvv
+          td= row.sv.ten
+          td= row.sv.lop
+          td= row.detai ? row.detai.ten : "Chưa có"
+          td= row.sv.group || ""
+          td= row.dhd ? row.dhd.diemBangSo : "Chưa nhập"
+          td
+            a.btn.btn-sm.btn-info(href=`/giangvien/diemhuongdan/form/${row.sv._id}`)
+              | #{row.dhd ? "Sửa" : "Nhập điểm"}
+            if row.dhd
+              a.btn.btn-sm.btn-success.ml-1(href=`/giangvien/diemhuongdan/export/${row.sv._id}`)
+                | Xuất Word

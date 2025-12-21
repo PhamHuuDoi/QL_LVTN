@@ -48,7 +48,7 @@ module.exports.detail = async (req, res) => {
     });
 
   } catch (err) {
-    console.log("❌ Lỗi detail:", err);
+    console.log(" Lỗi detail:", err);
     req.flash("error", "Lỗi xem chi tiết!");
     res.redirect("/admin/danhgiagk");
   }

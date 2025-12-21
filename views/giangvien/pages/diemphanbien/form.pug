@@ -1,0 +1,128 @@
+extends ../../layouts/default.pug
+
+block main
+  h3.text-primary NHẬP ĐIỂM PHẢN BIỆN
+
+  form(method="POST", action="/giangvien/diemphanbien/save")
+    input(type="hidden", name="phancongphanbien_id", value=pc._id)
+
+    .form-group
+      label Đề tài
+      input.form-control(type="text", readonly, value=detai.ten)
+
+    hr
+    h5.text-info Thông tin sinh viên
+
+    .row
+      .col-md-6
+        strong SV 01:
+        p #{detai.sv1.ten} (#{detai.sv1.msvv}) - Lớp #{detai.sv1.lop}
+      if detai.sv2
+        .col-md-6
+          strong SV 02:
+          p #{detai.sv2.ten} (#{detai.sv2.msvv}) - Lớp #{detai.sv2.lop}
+
+    hr
+    h5.text-info Điểm từng tiêu chí (0 - 2.5)
+
+    table.table.table-bordered
+      thead
+        tr
+          th Tiêu chí
+          th SV 01
+          if detai.sv2
+            th SV 02
+      tbody
+        tr
+          td Phân tích vấn đề
+          td
+            input.form-control(type="number", step="0.1", min="0", max="2.5", name="sv1_phanTichVanDe", value=(dpb && dpb.sv1 ? dpb.sv1.phanTichVanDe : 0))
+          if detai.sv2
+            td
+              input.form-control(type="number", step="0.1", min="0", max="2.5", name="sv2_phanTichVanDe", value=(dpb && dpb.sv2 ? dpb.sv2.phanTichVanDe : 0))
+
+        tr
+          td Thiết kế vấn đề
+          td
+            input.form-control(type="number", step="0.1", min="0", max="2.5", name="sv1_thietKeVanDe", value=(dpb && dpb.sv1 ? dpb.sv1.thietKeVanDe : 0))
+          if detai.sv2
+            td
+              input.form-control(type="number", step="0.1", min="0", max="2.5", name="sv2_thietKeVanDe", value=(dpb && dpb.sv2 ? dpb.sv2.thietKeVanDe : 0))
+
+        tr
+          td Hiện thực vấn đề
+          td
+            input.form-control(type="number", step="0.1", min="0", max="2.5", name="sv1_hienThucVanDe", value=(dpb && dpb.sv1 ? dpb.sv1.hienThucVanDe : 0))
+          if detai.sv2
+            td
+              input.form-control(type="number", step="0.1", min="0", max="2.5", name="sv2_hienThucVanDe", value=(dpb && dpb.sv2 ? dpb.sv2.hienThucVanDe : 0))
+
+        tr
+          td Kiểm tra sản phẩm
+          td
+            input.form-control(type="number", step="0.1", min="0", max="2.5", name="sv1_kiemTraSanPham", value=(dpb && dpb.sv1 ? dpb.sv1.kiemTraSanPham : 0))
+          if detai.sv2
+            td
+              input.form-control(type="number", step="0.1", min="0", max="2.5", name="sv2_kiemTraSanPham", value=(dpb && dpb.sv2 ? dpb.sv2.kiemTraSanPham : 0))
+
+    hr
+    h5.text-info Điểm bằng chữ & Đề nghị
+
+    .row
+      .col-md-6
+        h6 SV 01
+       
+        label Đề nghị:
+        .form-check
+          input.form-check-input(type="radio", name="sv1_deNghi", value="Được bảo vệ", checked=(!dpb || (dpb.sv1 && dpb.sv1.deNghi === "Được bảo vệ")))
+          label.form-check-label Được bảo vệ
+        .form-check
+          input.form-check-input(type="radio", name="sv1_deNghi", value="Không được bảo vệ", checked=(dpb && dpb.sv1 && dpb.sv1.deNghi === "Không được bảo vệ"))
+          label.form-check-label Không được bảo vệ
+        .form-check
+          input.form-check-input(type="radio", name="sv1_deNghi", value="Bổ sung/hiệu chỉnh để được bảo vệ", checked=(dpb && dpb.sv1 && dpb.sv1.deNghi === "Bổ sung/hiệu chỉnh để được bảo vệ"))
+          label.form-check-label Bổ sung/hiệu chỉnh để được bảo vệ
+
+      if detai.sv2
+        .col-md-6
+          h6 SV 02
+  
+          label Đề nghị:
+          .form-check
+            input.form-check-input(type="radio", name="sv2_deNghi", value="Được bảo vệ", checked=(!dpb || (dpb.sv2 && dpb.sv2.deNghi === "Được bảo vệ")))
+            label.form-check-label Được bảo vệ
+          .form-check
+            input.form-check-input(type="radio", name="sv2_deNghi", value="Không được bảo vệ", checked=(dpb && dpb.sv2 && dpb.sv2.deNghi === "Không được bảo vệ"))
+            label.form-check-label Không được bảo vệ
+          .form-check
+            input.form-check-input(type="radio", name="sv2_deNghi", value="Bổ sung/hiệu chỉnh để được bảo vệ", checked=(dpb && dpb.sv2 && dpb.sv2.deNghi === "Bổ sung/hiệu chỉnh để được bảo vệ"))
+            label.form-check-label Bổ sung/hiệu chỉnh để được bảo vệ
+
+    hr
+    h5.text-info Nhận xét chung cho nhóm
+
+      .form-group
+    label Nhận xét chung
+      select.form-control(name="nhanXetChung")
+        option(value="Đạt", selected=(dpb && dpb.nhanXetChung === "Đạt")) Đạt
+        option(value="Không đạt", selected=(dpb && dpb.nhanXetChung === "Không đạt")) Không đạt
+
+    .form-group
+      label Yêu cầu điều chỉnh
+      textarea.form-control(name="yeuCauDieuChinh", rows="2") #{dpb ? dpb.yeuCauDieuChinh : ""}
+
+    .form-group
+      label Ưu điểm
+      textarea.form-control(name="uuDiem", rows="2") #{dpb ? dpb.uuDiem : ""}
+
+    .form-group
+      label Thiếu sót
+      textarea.form-control(name="thieuSot", rows="2") #{dpb ? dpb.thieuSot : ""}
+
+    .form-group
+      label Câu hỏi cho hội đồng (tối đa 2 câu, mỗi dòng 1 câu)
+      textarea.form-control(name="cauHoiHoiDong", rows="3") #{dpb && dpb.cauHoiHoiDong ? dpb.cauHoiHoiDong.join("\n") : ""}
+
+    hr
+    button.btn.btn-success(type="submit") Lưu điểm phản biện
+    a.btn.btn-secondary(href="/giangvien/diemphanbien") Quay lại

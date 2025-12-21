@@ -16,7 +16,7 @@ const list = async (req, res) => {
     });
 
   } catch (err) {
-    console.error("❌ Lỗi lấy danh sách đề tài:", err);
+    console.error(" Lỗi lấy danh sách đề tài:", err);
     req.flash("error", "Không thể tải danh sách đề tài!");
     res.redirect("/admin/dashboard");
   }

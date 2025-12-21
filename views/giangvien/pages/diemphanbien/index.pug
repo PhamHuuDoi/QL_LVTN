@@ -1,0 +1,57 @@
+extends ../../layouts/default.pug
+
+block main
+  h3.text-primary.mb-3 NHẬP ĐIỂM PHẢN BIỆN
+
+  table.table.table-bordered.table-sm
+    thead.thead-light
+      tr
+        th(style="width:80px; text-align:center") Nhóm
+        th TV1
+        th MSSV
+        th(style="width:80px; text-align:center") Điểm
+        th TV2
+        th MSSV
+        th(style="width:80px; text-align:center") Điểm
+        th Đề tài
+        th GVHD
+        th(style="width:90px; text-align:center") Trạng thái
+        th(style="width:130px; text-align:center") Hành động
+
+    tbody
+      if rows && rows.length
+        each row in rows
+          - const dt = row.detai || {}
+          tr
+            // ===== Nhóm =====
+            td.text-center= dt.group || "—"
+
+            // ===== SV1 =====
+            td= dt.sv1 ? dt.sv1.ten : ""
+            td= dt.sv1 ? dt.sv1.msvv : ""
+            td.text-center= (row.dpb && row.dpb.sv1 && row.dpb.sv1.tongDiem != null) ? row.dpb.sv1.tongDiem : ""
+
+            // ===== SV2 =====
+            td= dt.sv2 ? dt.sv2.ten : ""
+            td= dt.sv2 ? dt.sv2.msvv : ""
+            td.text-center= (row.dpb && row.dpb.sv2 && row.dpb.sv2.tongDiem != null) ? row.dpb.sv2.tongDiem : ""
+
+            // ===== Đề tài =====
+            td= dt.ten || ""
+
+            // ===== GVHD =====
+            td= dt.giangvien_id ? dt.giangvien_id.hoten : ""
+
+            // ===== Trạng thái =====
+            td.text-center= row.dpb ? "Đã chấm" : "Chưa chấm"
+
+            // ===== Hành động =====
+            td.text-center(style="white-space: nowrap;")
+              a.btn.btn-sm.btn-info(href=`/giangvien/diemphanbien/form/${row.pc._id}`)
+                | #{row.dpb ? "Sửa" : "Nhập"}
+              if row.dpb
+                a.btn.btn-sm.btn-success.ml-1(href=`/giangvien/diemphanbien/export/${row.pc._id}`)
+                  | Word
+      else
+        tr
+          td(colspan="11", class="text-center text-muted") Không có dữ liệu phản biện.

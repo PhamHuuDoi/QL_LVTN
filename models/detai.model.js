@@ -15,7 +15,6 @@ const DeTaiSchema = new Schema(
 
     // tham chiếu tới phân công hướng dẫn (chứa svid, group,...)
     phancong_id: { type: Schema.Types.ObjectId, ref: "PhanCongHuongDan" },
-    group: { type: String },
     sv1: { type: Schema.Types.ObjectId, ref: "Sinhvien", required: true },
     sv2: { type: Schema.Types.ObjectId, ref: "Sinhvien" }, // optional
 

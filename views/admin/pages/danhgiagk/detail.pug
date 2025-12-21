@@ -19,7 +19,7 @@ block main
 
       tr
         th Đề tài
-        td #{dg.detai_id?.ten || "Chưa có"}
+        td= dg.detai_id ? dg.detai_id.ten : "Chưa có"
 
       tr
         th Điểm giữa kỳ
@@ -35,6 +35,6 @@ block main
 
       tr
         th Giảng viên đánh giá
-        td #{dg.giangvien_id?.hoten} (#{dg.giangvien_id?.magv})
+        td= dg.giangvien_id ? dg.giangvien_id.hoten : "Chưa có"
 
     a.btn.btn-secondary.mt-3(href="/admin/danhgia-gk") Quay lại
