@@ -11,7 +11,7 @@ block main
             .col-md-3
                 button.btn.btn-success(type="submit") Import từ Excel
             .col-md-3.text-right
-                a.btn.btn-primary(href="/admin/sinhvien/create") + Thêm sinh viên
+                a.btn.btn-primary(href="/admin/sinhvien/create") Thêm sinh viên
 
     form.form-inline.mb-3(method="GET", action="")
       input.form-control.mr-2(type="text", name="keyword", placeholder="Tìm kiếm theo tên hoặc MSSV", value=keyword)
@@ -43,9 +43,8 @@ block main
               td #{sv.group}
               td #{sv.supervisor ? sv.supervisor.hoten : '-'}
               //td #{sv.createdAtFormat}
-              td.text-center
-
-                a.btn.btn-sm.btn-warning.text-white(href=`/${prefixAdmin}/sinhvien/edit/${sv._id}`) Sửa
+              td
+                a.btn.btn-sm.btn-warning.text-white.me-3(href=`/${prefixAdmin}/sinhvien/edit/${sv._id}`) Sửa
                 button.btn.btn-sm.btn-danger.btn-delete(data-id=sv._id type="button") Xóa
     else
       p.text-muted.text-center.mt-4 Không có sinh viên nào.

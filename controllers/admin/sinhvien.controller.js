@@ -6,14 +6,13 @@ const fs = require("fs");
 const moment = require("moment");
 
 // [GET] /admin/sinhvien
-// [GET] /admin/sinhvien
 module.exports.index = async (req, res) => {
   try {
     const { keyword } = req.query;
     let filter = {};
-
+    // Tìm kiếm
     if (keyword && keyword.trim() !== "") {
-      const regex = new RegExp(keyword, "i"); // tìm gần đúng, không phân biệt hoa thường
+      const regex = new RegExp(keyword, "i");
       filter = {
         $or: [
           { ten: regex },
@@ -22,12 +21,14 @@ module.exports.index = async (req, res) => {
           { nganh: regex },
           { group: regex },
           { email: regex },
-          { "supervisor.hoten": regex }, // nếu bạn populate GVHD
         ],
       };
     }
+    // Lấy danh sách và sắp xếp theo nhóm giảm dần sinh viên với thông tin giảng viên hướng dẫn
+    const sinhviens = await Sinhvien.find(filter)
+      .populate("supervisor").lean();
+    sinhviens.sort((a, b) => Number(a.group) - Number(b.group));
 
-    const sinhviens = await Sinhvien.find(filter).populate("supervisor");
     res.render("admin/pages/sinhvien/index", {
       pageTitle: "Danh sách sinh viên",
       sinhviens,
@@ -42,6 +43,7 @@ module.exports.index = async (req, res) => {
   }
 };
 
+
 // [GET] /admin/sinhvien/create
 module.exports.create = (req, res) => {
   res.render("admin/pages/sinhvien/create", {
@@ -52,6 +54,17 @@ module.exports.create = (req, res) => {
 // [POST] /admin/sinhvien/create
 module.exports.createPost = async (req, res) => {
   try {
+    // Kiểm tra định dạng mã sinh viên
+    const { msvv } = req.body;
+
+    const regex = /^DH\d{8}$/;
+    if (!regex.test(msvv)) {
+      req.flash(
+        "error",
+        "Mã sinh viên phải có dạng DH + 8 chữ số (vd: DH52200511)"
+      );
+      return res.redirect("/admin/sinhvien/create");
+    }
     await Sinhvien.create(req.body);
     req.flash("success", "Thêm sinh viên thành công!");
     res.redirect("/admin/sinhvien");

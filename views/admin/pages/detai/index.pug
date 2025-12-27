@@ -1,40 +1,42 @@
 extends ../../layouts/default.pug
 
 block main
-  .container.mt-4
-    h2.text-primary Danh sách đề tài
+  .container-fluid
+    h2.mb-4 Danh sách đề tài
 
-    table.table.table-bordered.table-hover
-      thead.thead-dark
-        tr
-          th Nhóm
-          th Tên SV1
-          th MSSV1
-          th Tên SV2
-          th MSSV2
-          th Giảng viên HD
-          th Tên đề tài
-          th Xem chi tiết
-
-      tbody
-        each dt in detais
+    .table-responsive
+      table.table.table-bordered.table-hover.text-center
+        thead.thead-dark
           tr
-            td #{dt.group || "Không có"}
+            th Nhóm
+            th Tên SV1
+            th MSSV1
+            th Tên SV2
+            th MSSV2
+            th Giảng viên HD
+            th Tên đề tài
+            th Trạng thái
+            th Chi tiết
 
-            // SV1
-            td #{dt.sv1 ? dt.sv1.ten : "Không có"}
-            td #{dt.sv1 ? dt.sv1.msvv : "-"}
+        tbody
+          each dt in detais
+            tr
+              td #{dt.sv1 ? dt.sv1.group : "Không có"}
 
-            // SV2
-            td #{dt.sv2 ? dt.sv2.ten : "Không có"}
-            td #{dt.sv2 ? dt.sv2.msvv : "-"}
+              // SV1
+              td #{dt.sv1 ? dt.sv1.ten : "Không có"}
+              td #{dt.sv1 ? dt.sv1.msvv : "-"}
 
-            // GVHD
-            td #{dt.giangvien_id ? dt.giangvien_id.hoten : "Không có"}
+              // SV2
+              td #{dt.sv2 ? dt.sv2.ten : "Không có"}
+              td #{dt.sv2 ? dt.sv2.msvv : "Không có"}
 
-            // Đề tài
-            td #{dt.ten}
+              // GVHD
+              td #{dt.giangvien_id ? dt.giangvien_id.hoten : "Không có"}
 
-            // Link xem chi tiết
-            td 
-              a.btn.btn-info.btn-sm(href=`/admin/detai/detail/${dt._id}`) Xem
+              // Đề tài
+              td #{dt.ten}
+              td #{dt.trangthai}
+              // Link xem chi tiết
+              td 
+                a.btn.btn-info.btn-sm(href=`/admin/detai/detail/${dt._id}`) Xem

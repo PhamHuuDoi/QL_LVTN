@@ -7,7 +7,12 @@ const list = async (req, res) => {
       .populate({ path: "sv2", model: "Sinhvien" })
       .populate({ path: "giangvien_id", model: "Giangvien" })
       .lean();
-
+    // sắp xếp theo nhóm của sv1 hoặc sv2
+    detais.sort((a, b) => {
+      const groupA = a.sv1 ? a.sv1.group : (a.sv2 ? a.sv2.group : "");
+      const groupB = b.sv1 ? b.sv1.group : (b.sv2 ? b.sv2.group : "");
+      return groupA.localeCompare(groupB);
+    });
     res.render("admin/pages/detai/index", {
       pageTitle: "Danh sách đề tài",
       detais,

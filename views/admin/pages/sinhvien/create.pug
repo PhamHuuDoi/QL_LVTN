@@ -6,7 +6,15 @@ block main
     form(method="POST" action=`/${prefixAdmin}/sinhvien/create`)
       .form-group
         label Mã sinh viên
-        input.form-control(type="text" name="msvv" required)
+        input.form-control(
+          type="text",
+          name="msvv",
+          required,
+          pattern="^DH[0-9]{8}$",
+          placeholder="VD: DH52200511",
+          title="Mã sinh viên phải có dạng DH + 8 chữ số"
+        )
+
       .form-group
         label Họ tên
         input.form-control(type="text" name="ten" required)
