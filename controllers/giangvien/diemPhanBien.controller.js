@@ -172,8 +172,6 @@ module.exports.save = async (req, res) => {
         : "Cập nhật điểm phản biện thành công!"
     );
     res.redirect("/giangvien/diemphanbien");
-
-    res.redirect("/giangvien/diemphanbien");
   } catch (err) {
     console.error(" SAVE PB:", err);
     req.flash("error", "Lưu điểm phản biện thất bại!");

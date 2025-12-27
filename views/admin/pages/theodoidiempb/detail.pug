@@ -1,0 +1,100 @@
+extends ../../layouts/default.pug
+
+block main
+  h3.text-primary.mb-3 CHI TIẾT ĐIỂM PHẢN BIỆN
+
+  .form-group
+    label Đề tài
+    input.form-control(type="text", readonly, value=detai.ten)
+
+  hr
+  h5.text-info Thông tin sinh viên
+
+  .row
+    .col-md-6
+      strong SV 01:
+      p #{detai.sv1.ten} (#{detai.sv1.msvv}) - Lớp #{detai.sv1.lop}
+    if detai.sv2
+      .col-md-6
+        strong SV 02:
+        p #{detai.sv2.ten} (#{detai.sv2.msvv}) - Lớp #{detai.sv2.lop}
+
+  hr
+  h5.text-info Điểm từng tiêu chí (0 - 2.5)
+
+  table.table.table-bordered
+    thead
+      tr
+        th Tiêu chí
+        th.text-center SV 01
+        if detai.sv2
+          th.text-center SV 02
+    tbody
+      tr
+        td Phân tích vấn đề
+        td.text-center= (dpb && dpb.sv1 && dpb.sv1.phanTichVanDe) || 0
+        if detai.sv2
+          td.text-center= (dpb && dpb.sv2 && dpb.sv2.phanTichVanDe) || 0
+
+      tr
+        td Thiết kế vấn đề
+        td.text-center= (dpb && dpb.sv1 && dpb.sv1.thietKeVanDe) || 0
+        if detai.sv2
+          td.text-center= (dpb && dpb.sv2 && dpb.sv2.thietKeVanDe) || 0
+
+      tr
+        td Hiện thực vấn đề
+        td.text-center= (dpb && dpb.sv1 && dpb.sv1.hienThucVanDe) || 0
+        if detai.sv2
+          td.text-center= (dpb && dpb.sv2 && dpb.sv2.hienThucVanDe) || 0
+
+      tr
+        td Kiểm tra sản phẩm
+        td.text-center= (dpb && dpb.sv1 && dpb.sv1.kiemTraSanPham) || 0
+        if detai.sv2
+          td.text-center= (dpb && dpb.sv2 && dpb.sv2.kiemTraSanPham) || 0
+
+      tr.table-success
+        td Tổng điểm
+        td.text-center= (dpb && dpb.sv1 && dpb.sv1.tongDiem) || 0
+        if detai.sv2
+          td.text-center= (dpb && dpb.sv2 && dpb.sv2.tongDiem) || 0
+
+  hr
+  h5.text-info Đề nghị
+
+  .row
+    .col-md-6
+      h6 SV 01
+      p= (dpb && dpb.sv1 && dpb.sv1.deNghi) || "—"
+    if detai.sv2
+      .col-md-6
+        h6 SV 02
+        p= (dpb && dpb.sv2 && dpb.sv2.deNghi) || "—"
+
+  hr
+  h5.text-info Nhận xét chung cho nhóm
+
+  p
+    b Kết luận:
+    |  #{dpb.nhanXetChung || "—"}
+
+  p
+    b Yêu cầu điều chỉnh:
+    |  #{dpb.yeuCauDieuChinh || ""}
+
+  p
+    b Ưu điểm:
+    |  #{dpb.uuDiem || ""}
+
+  p
+    b Thiếu sót:
+    |  #{dpb.thieuSot || ""}
+
+  if dpb.cauHoiHoiDong && dpb.cauHoiHoiDong.length
+    p
+      b Câu hỏi hội đồng:
+    pre= dpb.cauHoiHoiDong.join("\n")
+
+  hr
+  a.btn.btn-secondary(href="/admin/theodoidiempb") Quay lại

@@ -1,0 +1,77 @@
+extends ../../layouts/default.pug
+
+block main
+  .d-flex.justify-content-between.align-items-center.mb-3
+    h3.text-primary.mb-0 QUẢN LÝ HỘI ĐỒNG
+    a.btn.btn-success(href="/admin/hoidong/create")
+      i.fa.fa-plus
+      |  Thêm hội đồng
+
+  table.table.table-bordered.table-sm
+    thead.thead-light
+      tr
+        th.text-center Tên hội đồng
+        th Chủ tịch
+        th Thư ký
+        th Ủy viên
+        th.text-center Ngày bảo vệ
+        th.text-center Phòng
+        th.text-center Hành động
+    tbody
+      if rows && rows.length
+        each r in rows
+          tr
+            // ===== TÊN HĐ =====
+            td.text-center.font-weight-bold= r.mahd
+
+            // ===== CHỦ TỊCH =====
+            td
+              if r.chutich
+                | #{r.chutich.gv_id.magv} - #{r.chutich.gv_id.hoten}
+              else
+                span.text-muted —
+
+            // ===== THƯ KÝ =====
+            td
+              if r.thuky
+                | #{r.thuky.gv_id.magv} - #{r.thuky.gv_id.hoten}
+              else
+                span.text-muted —
+
+            // ===== ỦY VIÊN =====
+            td
+              if r.uyviens && r.uyviens.length
+                each u, i in r.uyviens
+                  span= u.gv_id.hoten
+                  if i < r.uyviens.length - 1
+                    | , 
+              else
+                span.text-muted —
+
+            // ===== NGÀY BV =====
+            td.text-center
+              if r.ngaybv
+                = new Date(r.ngaybv).toLocaleDateString("vi-VN")
+              else
+                span.text-muted —
+
+            // ===== PHÒNG =====
+            td.text-center= r.phonghd || "—"
+
+            // ===== ACTION =====
+            td.text-center
+              a.btn.btn-sm.btn-warning.mr-1(
+                href=`/admin/hoidong/${r.id}/edit`
+              ) Sửa
+              form(
+                method="POST",
+                action=`/admin/hoidong/delete/${r.id}`,
+                style="display:inline"
+              )
+                button.btn.btn-sm.btn-danger(
+                  type="submit",
+                  onclick="return confirm('Bạn có chắc muốn xóa hội đồng này?')"
+                ) Xóa
+      else
+        tr
+          td(colspan="7", class="text-center text-muted") Chưa có hội đồng nào.

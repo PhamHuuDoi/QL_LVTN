@@ -1,0 +1,44 @@
+extends ../../layouts/default.pug
+
+block main
+  h3.text-primary.mb-3 NHẬP ĐIỂM HỘI ĐỒNG
+
+  table.table.table-bordered.table-sm
+    thead.thead-light
+      tr
+        th Nhóm
+        th MSSV
+        th Tên SV
+        th Đề tài
+        th Hội đồng
+        th Điểm
+        th Lưu
+    tbody
+      if rows.length
+        each r in rows
+          tr
+            td.text-center= r.group || "—"
+            td= r.sv.msvv
+            td= r.sv.ten
+            td= r.detai ? r.detai.ten : "—"
+            td= r.hoidong ? r.hoidong.tenhd : "—"
+
+            // 👉 Gộp input + button trong cùng form
+            td(colspan="2")
+              form.d-flex(
+                method="POST",
+                action=`/giangvien/diemhoidong/save/${r.pcId}/${r.svKey}`
+              )
+                input.form-control.form-control-sm.mr-2(
+                  type="number",
+                  step="0.1",
+                  min="0",
+                  max="10",
+                  name="diem",
+                  value=(r.diem || "")
+                )
+                button.btn.btn-sm.btn-success(type="submit") Lưu
+      else
+        tr
+          td(colspan="7", class="text-center text-muted")
+            | Chưa có sinh viên nào cần nhập điểm.

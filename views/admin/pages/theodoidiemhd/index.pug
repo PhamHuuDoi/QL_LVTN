@@ -1,0 +1,35 @@
+extends ../../layouts/default.pug
+
+block main
+  h3.text-primary.mb-3 THEO DÕI ĐIỂM HƯỚNG DẪN
+
+  a.btn.btn-success.mb-3(href="/admin/theodoidiemhd/export")
+    | Xuất Excel
+
+  table.table.table-bordered.table-sm
+    thead.thead-light
+      tr
+        th Nhóm
+        th MSSV
+        th Tên SV
+        th Đề tài
+        th GVHD
+        th Điểm
+        th Đề nghị
+        th Hành động
+    tbody
+      if rows.length
+        each r in rows
+          tr
+            td.text-center= r.group
+            td= r.mssv
+            td= r.ten
+            td= r.detai
+            td= r.gvhd
+            td.text-center= r.diem
+            td= r.denghi
+            td.text-center
+              a.btn.btn-sm.btn-info(href=`/admin/theodoidiemhd/detail/${r.id}`) Xem
+      else
+        tr
+          td(colspan="8", class="text-center text-muted") Chưa có dữ liệu.

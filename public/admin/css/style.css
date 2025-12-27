@@ -1,39 +1,45 @@
-/* Header */
+/* ===== Header ===== */
 .header {
-  background: #202020;
+  background: linear-gradient(90deg, #1f2933, #111827);
   padding: 10px 0;
   position: sticky;
   top: 0;
-	z-index: 999;
+  z-index: 999;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
 }
 
 .header .inner-logo a {
   font-size: 24px;
   font-weight: 700;
-  color: #fff;
+  color: #f9fafb;
+  text-decoration: none;
 }
-/* End Header */
+/* ===== End Header ===== */
 
-/* Body */
+
+/* ===== Body ===== */
 .body .sider {
-  width: 150px;
-  background: #323232;
-  color: #fff;
+  width: 170px;
+  background: #1f2933;
+  color: #e5e7eb;
   height: calc(100vh - 56px);
   position: fixed;
   top: 56px;
   left: 0;
+  overflow-y: auto;
+  box-shadow: 2px 0 6px rgba(0,0,0,0.25);
 }
 
 .body .main {
   margin: 15px;
   position: relative;
-  left: 150px;
-  width: calc(100% - 180px);
+  left: 170px;
+  width: calc(100% - 200px);
 }
-/* End Body */
+/* ===== End Body ===== */
 
-/* Sider */
+
+/* ===== Sider Menu ===== */
 .sider .inner-menu ul {
   list-style: none;
   padding: 0;
@@ -41,36 +47,97 @@
 }
 
 .sider .inner-menu ul li a {
-  color: #fff;
+  color: #e5e7eb;
   display: block;
-  padding: 6px 10px;
-  border-bottom: 1px solid #515151;
+  padding: 8px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  text-decoration: none;
+  transition: all 0.2s ease;
 }
-/* End Sider */
 
-/* show-alert */
+.sider .inner-menu ul li a:hover {
+  background: #2563eb;
+  color: #fff;
+  padding-left: 20px;
+}
+
+/* Active (nếu bạn có class active) */
+.sider .inner-menu ul li a.active {
+  background: #1d4ed8;
+  color: #fff;
+  font-weight: 600;
+}
+/* ===== End Sider ===== */
+
+
+/* ===== Menu Group ===== */
+.menu-group > span {
+  display: block;
+  padding: 10px 14px;
+  font-weight: 600;
+  color: #9ca3af;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  background: rgba(255,255,255,0.03);
+}
+
+.menu-group > span:hover {
+  color: #fff;
+  background: rgba(37,99,235,0.4);
+}
+
+.sub-menu {
+  padding-left: 10px;
+  background: #111827;
+  display: none;
+}
+
+.sub-menu.open {
+  display: block;
+}
+
+.sub-menu li a {
+  font-size: 14px;
+  padding: 7px 14px;
+  color: #cbd5f5;
+}
+
+.sub-menu li a:hover {
+  background: #1e40af;
+  color: #fff;
+}
+/* ===== End Menu Group ===== */
+
+
+/* ===== show-alert ===== */
 .show-alert {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    padding: 12px 18px;
-    border-radius: 6px;
-    z-index: 9999;
-    opacity: 1;
-    transition: opacity 0.5s ease-out;
+  position: fixed;
+  top: 80px; /* Chỉnh lại để không đè lên header */
+  right: 20px;
+  padding: 12px 18px;
+  border-radius: 6px;
+  z-index: 9999;
+  /* Hiệu ứng chuyển cảnh */
+  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+  opacity: 1;
+  transform: translateX(0);
 }
 
 .show-alert.hide {
-    opacity: 0;
+  opacity: 0;
+  transform: translateX(100%); /* Đẩy thông báo ra khỏi màn hình khi ẩn */
 }
-/* End show-alert */
+/* ===== End show-alert ===== */
 
-/* image-preview */
+
+/* ===== image-preview ===== */
 .image-preview {
   width: 150px;
   height: auto;
   margin-top: 15px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
+  border: 1px solid #374151;
+  border-radius: 6px;
 }
-/* End image-preview */
+/* ===== End image-preview ===== */

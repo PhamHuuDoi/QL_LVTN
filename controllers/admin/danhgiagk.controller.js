@@ -19,7 +19,7 @@ module.exports.list = async (req, res) => {
       danhgias,
     });
   } catch (err) {
-    console.log("❌ Lỗi load list:", err);
+    console.log(" Lỗi load list:", err);
     res.status(500).send("Lỗi tải danh sách");
   }
 };

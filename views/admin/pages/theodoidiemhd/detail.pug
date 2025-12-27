@@ -1,0 +1,55 @@
+extends ../../layouts/default.pug
+
+block main
+  .container
+    h4.text-primary.mb-3 Chi tiết điểm hướng dẫn
+
+    .card.mb-3
+      .card-body
+        p
+          b Sinh viên:
+          |  #{d.sv_id.ten} (#{d.sv_id.msvv}) - Nhóm #{d.sv_id.group}
+        p
+          b Đề tài:
+          |  #{d.detai_id.ten}
+        p
+          b GVHD:
+          |  #{d.detai_id.giangvien_id.hoten}
+
+    table.table.table-bordered
+      tr
+        th Phân tích vấn đề
+        td= d.phanTichVanDe
+      tr
+        th Thiết kế vấn đề
+        td= d.thietKeVanDe
+      tr
+        th Hiện thực vấn đề
+        td= d.hienThucVanDe
+      tr
+        th Kiểm tra sản phẩm
+        td= d.kiemTraSanPham
+      tr
+        th Tổng điểm
+        td
+          b= d.tongDiem
+      tr
+        th Đề nghị GV
+        td= d.deNghiGV
+
+    if d.uuDiem
+      p
+        b Ưu điểm:
+        |  #{d.uuDiem}
+
+    if d.thieuSot
+      p
+        b Thiếu sót:
+        |  #{d.thieuSot}
+
+    if d.yeuCauDieuChinh
+      p
+        b Yêu cầu điều chỉnh:
+        |  #{d.yeuCauDieuChinh}
+
+    a.btn.btn-secondary.mt-3(href="/admin/theodoidiemhd") Quay lại

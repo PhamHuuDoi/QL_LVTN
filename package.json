@@ -23,6 +23,7 @@
     "connect-flash": "^0.1.1",
     "docxtemplater": "^3.67.6",
     "dotenv": "^17.2.3",
+    "exceljs": "^4.4.0",
     "express": "^5.1.0",
     "express-flash": "^0.0.2",
     "express-session": "^1.18.2",

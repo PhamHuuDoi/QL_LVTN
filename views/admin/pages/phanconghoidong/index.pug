@@ -1,0 +1,87 @@
+extends ../../layouts/default.pug
+
+block main
+  h3.text-primary.mb-3 PHÂN CÔNG HỘI ĐỒNG CHO NHÓM SINH VIÊN
+
+  a.btn.btn-success.mb-3(href="/admin/dsnhombv/export") Xuất Excel
+
+  table.table.table-bordered.table-sm
+    thead.thead-light
+      tr
+        th Nhóm
+        th SV 1
+        th SV 2
+        th Đề tài
+        th GVHD
+        th Hội đồng
+        th Hành động
+    tbody
+      if rows.length
+        each r in rows
+          tr
+            // ===== Nhóm =====
+            td.text-center= r.group || "—"
+
+            // ===== SV1 =====
+            td
+              if r.sv1
+                | #{r.sv1.ten} (#{r.sv1.msvv})
+              else
+                span.text-muted —
+
+            // ===== SV2 =====
+            td
+              if r.sv2
+                | #{r.sv2.ten} (#{r.sv2.msvv})
+              else
+                span.text-muted —
+
+            // ===== Đề tài =====
+            td
+              if r.detai
+                | #{r.detai.ten}
+              else
+                span.text-muted —
+
+            // ===== GVHD =====
+            td
+              if r.gvhd
+                | #{r.gvhd.hoten}
+              else
+                span.text-muted —
+
+            // ===== Hội đồng =====
+            td
+              if r.hoidong
+                | #{r.hoidong.tenhd}
+              else
+                span.text-muted Chưa phân công
+
+            // ===== Hành động =====
+            td
+              if !r.hoidong
+                form(method="POST", action="/admin/dsnhombv/assign")
+                  input(type="hidden", name="sv1", value=r.sv1._id)
+                  if r.sv2
+                    input(type="hidden", name="sv2", value=r.sv2._id)
+                  input(type="hidden", name="detai_id", value=r.detai._id)
+
+                  select.form-control.form-control-sm(name="hd_id", required)
+                    option(value="") -- Chọn hội đồng --
+                    each hd in hoidongs
+                      option(value=hd._id)= hd.tenhd
+
+                  button.btn.btn-sm.btn-primary.mt-1(type="submit") Gán
+              else
+                form(method="POST", action=`/admin/dsnhombv/update/${r.pcId}`)
+                  select.form-control.form-control-sm(name="hd_id", required)
+                    each hd in hoidongs
+                        option(
+                            value=hd._id,
+                            selected=(r.hoidong && r.hoidong._id.toString() === hd._id.toString())
+                        )= hd.tenhd
+
+                  button.btn.btn-sm.btn-warning.mt-1(type="submit") Sửa
+      else
+        tr
+          td(colspan="7", class="text-center text-muted") Không có dữ liệu.

@@ -8,7 +8,7 @@ const GVSchema = new Schema({
   email: { type: String },
   roles: [{
     type: String,
-    enum: ["huongdan", "phanbien", "hoidong"],
+    enum: ["huongdan", "phanbien"],
   }],
 }, { timestamps: true });
 

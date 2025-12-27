@@ -1,16 +1,108 @@
-document.addEventListener("DOMContentLoaded", function() {
-    const alerts = document.querySelectorAll('.show-alert');
+document.addEventListener("DOMContentLoaded", function () {
+  const alerts = document.querySelectorAll(".show-alert");
 
-    alerts.forEach(alert => {
-        const time = parseInt(alert.dataset.time) || 30000; // default 30s
+  if (alerts.length > 0) {
+    alerts.forEach((alert) => {
+      // Lấy thời gian từ data-time, mặc định là 3000ms nếu không nhập
+      // Lưu ý: Nếu bạn muốn 30s thì truyền vào mixin là 30000
+      const time = parseInt(alert.getAttribute("data-time")) || 3000;
 
-        setTimeout(() => {
-            alert.classList.add("hide");
-        }, time);
+      // Sau khoảng 'time', thêm class 'hide' để mờ dần (opacity: 0)
+      setTimeout(() => {
+        alert.classList.add("hide");
+      }, time);
 
-        // Xóa khỏi DOM sau khi fade-out
-        setTimeout(() => {
-            alert.remove();
-        }, time + 600);
+      // Sau khi mờ hẳn (đợi thêm 500ms transition), xóa hẳn khỏi DOM
+      setTimeout(() => {
+        alert.remove();
+      }, time + 500);
     });
+  }
+});
+
+document.querySelectorAll(".menu-group > span").forEach((el) => {
+  el.addEventListener("click", () => {
+    el.nextElementSibling.classList.toggle("open");
+  });
+});
+// Add thêm ủy
+document.addEventListener("DOMContentLoaded", () => {
+  const wrapper = document.getElementById("uyvien-wrapper");
+  const addBtn = document.getElementById("addUyVienBtn");
+  const chutichSelect = document.getElementById("chutichSelect");
+  const thukySelect = document.getElementById("thukySelect");
+
+  // ===== Cập nhật ẩn option trùng =====
+  function updateOptions() {
+    const chutich = chutichSelect?.value;
+    const thuky = thukySelect?.value;
+
+    const uyvienSelects = wrapper.querySelectorAll(".uyvien-select");
+    const selectedUyviens = Array.from(uyvienSelects).map((s) => s.value);
+
+    uyvienSelects.forEach((select) => {
+      Array.from(select.options).forEach((opt) => {
+        if (!opt.value) return;
+
+        let hide = false;
+
+        // trùng chủ tịch hoặc thư ký
+        if (opt.value === chutich || opt.value === thuky) hide = true;
+
+        // trùng ủy viên khác
+        if (selectedUyviens.includes(opt.value) && select.value !== opt.value)
+          hide = true;
+
+        opt.hidden = hide;
+      });
+    });
+  }
+
+  // ===== Thêm ô ủy viên =====
+  function addUyVien() {
+    const first = wrapper.querySelector(".uyvien-item");
+    const clone = first.cloneNode(true);
+
+    const select = clone.querySelector("select");
+    select.value = "";
+
+    // đổi nút + thành -
+    const btn = clone.querySelector("button");
+    btn.textContent = "-";
+    btn.classList.remove("btn-success");
+    btn.classList.add("btn-danger");
+    btn.classList.remove("ml-2");
+    btn.classList.add("ml-2", "removeUyVienBtn");
+    btn.removeAttribute("id");
+
+    wrapper.appendChild(clone);
+
+    select.addEventListener("change", updateOptions);
+    btn.addEventListener("click", () => {
+      clone.remove();
+      updateOptions();
+    });
+
+    updateOptions();
+  }
+
+  // ===== Sự kiện =====
+  if (addBtn) addBtn.addEventListener("click", addUyVien);
+
+  chutichSelect?.addEventListener("change", updateOptions);
+  thukySelect?.addEventListener("change", updateOptions);
+
+  wrapper.querySelectorAll(".uyvien-select").forEach((sel) => {
+    sel.addEventListener("change", updateOptions);
+  });
+
+  wrapper.querySelectorAll(".removeUyVienBtn").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.target.closest(".uyvien-item").remove();
+      updateOptions();
+    });
+  });
+
+  // init
+  updateOptions();
 });

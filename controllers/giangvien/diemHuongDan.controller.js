@@ -8,7 +8,6 @@ const DeTai = require("../../models/detai.model");
 const SinhVien = require("../../models/sinhVien.model");
 const DanhGia = require("../../models/danhGiaGiuaKy.model");
 const DiemHD = require("../../models/diemHuongDan.model");
-
 // =============================
 // LIST: SV GK = "Làm tiếp"
 // =============================
@@ -135,9 +134,18 @@ const save = async (req, res) => {
       cauHoiHoiDong: req.body.cauHoiHoiDong?.split("\n") || [],
       deNghiGV: req.body.deNghiGV,
     };
+    const toNum = (v) => (v === undefined || v === "" ? 0 : Number(v));
 
+    const tong =
+      toNum(req.body.phanTichVanDe) +
+      toNum(req.body.thietKeVanDe) +
+      toNum(req.body.hienThucVanDe) +
+      toNum(req.body.kiemTraSanPham);
+
+    data.tongDiem = tong;
+    data.diemBangSo = tong;
     let dhd = await DiemHD.findOne({ sv_id, detai_id });
-
+    
     if (!dhd) {
       await DiemHD.create(data);
       req.flash("success", "Đã lưu điểm hướng dẫn!");

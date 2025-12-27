@@ -1,0 +1,100 @@
+extends ../../layouts/default.pug
+
+block main
+  h3.text-primary.mb-3= isEdit ? "SỬA HỘI ĐỒNG" : "TẠO HỘI ĐỒNG"
+
+  form#hoiDongForm(
+    method="POST",
+    action= isEdit ? `/admin/hoidong/${hoidong._id}/edit` : "/admin/hoidong/create"
+  )
+
+    // ===== TÊN HỘI ĐỒNG =====
+    .form-group
+      label Tên hội đồng
+      if isEdit
+        input.form-control(type="text", value=hoidong.tenhd, readonly)
+      else
+        input.form-control(type="text", name="tenhd", required)
+
+    // ===== MÔ TẢ =====
+    .form-group
+      label Mô tả
+      textarea.form-control(name="mota", rows="2") #{hoidong && hoidong.mota ? hoidong.mota : ""}
+    .form-group
+      label Ngày bảo vệ
+      input.form-control(
+        type="date",
+        name="ngaybv",
+        required,
+        value=(hoidong && hoidong.ngaybv ? hoidong.ngaybv.toISOString().substring(0,10) : "")
+      )
+
+    .form-group
+      label Phòng hội đồng
+      input.form-control(
+        type="text",
+        name="phonghd",
+        required,
+        value=(hoidong && hoidong.phonghd ? hoidong.phonghd : "")
+      )
+
+    // ===== LẤY CHI TIẾT (KHI EDIT) =====
+    - const ct = chitiets ? chitiets.find(c => c.chucvu === "Chủ tịch") : null
+    - const tk = chitiets ? chitiets.find(c => c.chucvu === "Thư ký") : null
+    - const uvs = chitiets ? chitiets.filter(c => c.chucvu === "Ủy viên") : []
+
+    // ===== CHỦ TỊCH =====
+    .form-group
+      label Chủ tịch
+      select.form-control(name="chutich", id="chutichSelect", required)
+        option(value="") -- Chọn --
+        each gv in gvs
+          option(
+            value=gv._id,
+            selected=(ct && ct.gv_id && ct.gv_id._id.toString() === gv._id.toString())
+          ) #{gv.magv} - #{gv.hoten}
+
+    // ===== THƯ KÝ =====
+    .form-group
+      label Thư ký
+      select.form-control(name="thuky", id="thukySelect", required)
+        option(value="") -- Chọn --
+        each gv in gvs
+          option(
+            value=gv._id,
+            selected=(tk && tk.gv_id && tk.gv_id._id.toString() === gv._id.toString())
+          ) #{gv.magv} - #{gv.hoten}
+
+    // ===== ỦY VIÊN - DÙNG JS ĐỂ THÊM BỚT =====
+    .form-group
+      label Ủy viên
+      #uyvien-wrapper
+        .d-flex.mb-2.uyvien-item
+          select.form-control.uyvien-select(name="uyviens")
+            option(value="") -- Chọn --
+            each gv in gvs
+              option(
+                value=gv._id,
+                selected=(uvs[0] && uvs[0].gv_id && uvs[0].gv_id._id.toString() === gv._id.toString())
+              ) #{gv.magv} - #{gv.hoten}
+          button.btn.btn-success.ml-2(type="button", id="addUyVienBtn") +
+
+        // 👉 nếu edit và có >1 ủy viên thì render thêm
+        if uvs.length > 1
+          each u, i in uvs
+            if i > 0
+              .d-flex.mb-2.uyvien-item
+                select.form-control.uyvien-select(name="uyviens")
+                  option(value="") -- Chọn --
+                  each gv in gvs
+                    option(
+                      value=gv._id,
+                      selected=(u.gv_id && u.gv_id._id.toString() === gv._id.toString())
+                    ) #{gv.magv} - #{gv.hoten}
+                button.btn.btn-danger.ml-2(type="button", class="removeUyVienBtn") -
+
+    // ===== BUTTON =====
+    button.btn.btn-success(type="submit")
+      = isEdit ? "Cập nhật" : "Tạo hội đồng"
+    a.btn.btn-secondary.ml-2(href="/admin/hoidong") Hủy
+

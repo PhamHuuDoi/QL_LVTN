@@ -1,7 +1,8 @@
 mixin alert-success(time, messages)
-  if messages && messages.success
+  // Chỉ tạo thẻ div nếu messages.success có dữ liệu thật sự
+  if messages && messages.success && messages.success.length > 0
     div.alert.alert-success.show-alert(data-time=time)= messages.success
 
 mixin alert-error(time, messages)
-  if messages && messages.error
+  if messages && messages.error && messages.error.length > 0
     div.alert.alert-danger.show-alert(data-time=time)= messages.error
