@@ -43,10 +43,23 @@ module.exports.index = async (req, res) => {
         });
       }
     });
+    const filter = req.query.filter || "all";
+    let filteredRows = rows;
+    if (filter === "yes") {
+      filteredRows = rows.filter((r) => r.diem && r.diem > 0);
+    } else if (filter === "no") {
+      filteredRows = rows.filter((r) => !r.diem || r.diem === 0);
+    }
+    // Sắp xếp theo nhóm
+    filteredRows.sort((a, b) => {
+      const groupA = a.sv.group || "";
+      const groupB = b.sv.group || "";
+      return groupA.localeCompare(groupB);
+    });
 
     res.render("giangvien/pages/diemhoidong/index", {
       pageTitle: "Nhập điểm hội đồng",
-      rows,
+      rows: filteredRows,
       success: req.flash("success"),
       error: req.flash("error"),
     });

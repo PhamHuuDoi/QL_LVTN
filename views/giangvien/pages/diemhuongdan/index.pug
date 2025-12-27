@@ -1,10 +1,20 @@
 extends ../../layouts/default.pug
 
 block main
-  h3.text-primary NHẬP ĐIỂM HƯỚNG DẪN
+  h3.mb-2 NHẬP ĐIỂM HƯỚNG DẪN
+    .dropdown
+          button.btn.btn-outline-primary.dropdown-toggle(type="button" data-toggle="dropdown")
+            | Lọc
+          ul.dropdown-menu.dropdown-menu-right
+            li
+              a.dropdown-item(href="?filter=all") Tất cả
+            li
+              a.dropdown-item(href="?filter=yes") Đã chấm điểm
+            li
+              a.dropdown-item(href="?filter=no") Chưa chấm điểm
 
-  table.table.table-bordered
-    thead
+  table.table.table-bordered.table-hover
+    thead.table-dark
       tr
         th MSSV
         th Họ tên
@@ -19,12 +29,31 @@ block main
           td= row.sv.msvv
           td= row.sv.ten
           td= row.sv.lop
-          td= row.detai ? row.detai.ten : "Chưa có"
-          td= row.sv.group || ""
-          td= row.dhd ? row.dhd.diemBangSo : "Chưa nhập"
           td
-            a.btn.btn-sm.btn-info(href=`/giangvien/diemhuongdan/form/${row.sv._id}`)
-              | #{row.dhd ? "Sửa" : "Nhập điểm"}
+            if row.detai
+              strong #{row.detai.ten}
+              // HIỂN THỊ CẢNH BÁO NẾU ĐÃ PHÂN CÔNG HỘI ĐỒNG
+              if row.daPhanCongHD
+                small.d-block.text-danger
+                  | Đã phân công hội đồng
+            else
+              span.text-muted Chưa có
+          td= row.sv.group || ""
+          td
             if row.dhd
-              a.btn.btn-sm.btn-success.ml-1(href=`/giangvien/diemhuongdan/export/${row.sv._id}`)
+              strong.text-primary #{row.dhd.diemBangSo}
+            else
+              span.text-muted Chưa nhập
+          td
+            // KIỂM TRA: NẾU ĐÃ PHÂN CÔNG HỘI ĐỒNG THÌ ẨN NÚT SỬA
+            if !row.daPhanCongHD
+              a.btn.btn-sm.btn-info.mr-1(href=`/giangvien/diemhuongdan/form/${row.sv._id}`)
+                | #{row.dhd ? "Sửa" : "Nhập điểm"}
+            else
+               a.btn.btn-sm.btn-primary.mr-1(href=`/giangvien/diemhuongdan/detail/${row.sv._id}`)
+                | #{row.dhd ? "detail" : "Nhập điểm"}
+            
+            // NÚT XUẤT WORD (VẪN HIỆN KHI CÓ ĐIỂM)
+            if row.dhd
+              a.btn.btn-sm.btn-success(href=`/giangvien/diemhuongdan/export/${row.sv._id}`)
                 | Xuất Word

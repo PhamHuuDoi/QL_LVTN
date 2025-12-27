@@ -1,36 +1,64 @@
 extends ../../layouts/default.pug
 
 block main
-  - pageTitle = "Quản lý Đề tài"
+  .container-fluid
+    .d-flex.justify-content-between.align-items-center.mb-4
+      h3.mb-2 Quản lý đề tài
+      .dropdown
+        button.btn.btn-outline-primary.dropdown-toggle(type="button" data-toggle="dropdown")
+          | Lọc
+        ul.dropdown-menu.dropdown-menu-right
+          li
+            a.dropdown-item(href="?filter=all") Tất cả
+          li
+            a.dropdown-item(href="?filter=hasDetai") Đã có đề tài
+          li
+            a.dropdown-item(href="?filter=noDetai") Chưa có đề tài
 
-  .container.mt-4
-    h2.mb-4.text-primary Quản lý Đề tài
-
-    table.table.table-bordered.table-hover
-      thead.bg-light
-        tr
-          th Nhóm
-          th Thành viên 1
-          th Thành viên 2
-          th Tên đề tài
-          th Hành động
-
-      tbody
-        each row in rows
-          tr
-            td #{row.group}
-            td #{row.sv1 ? `${row.sv1.ten} (${row.sv1.msvv})` : ""}
-            td #{row.sv2 ? `${row.sv2.ten} (${row.sv2.msvv})` : ""}
-
-            if row.detai
-              td #{row.detai.ten}
-            else
-              td.text-muted Chưa có đề tài
-
-            td
-              if row.detai
-                a.btn.btn-info.btn-sm(href=`/giangvien/detai/detail/${row.detai._id}`) Chi tiết
-                a.btn.btn-warning.btn-sm(href=`/giangvien/detai/edit/${row.detai._id}`) Sửa
-                a.btn.btn-secondary.btn-sm(href=`/giangvien/detai/export/${row.detai._id}` target="_blank") Export
-              else
-                a.btn.btn-success.btn-sm(href=`/giangvien/detai/create?group=${row.group}`) + Tạo đề tài
+    if rows.length
+      .table-responsive
+        table.table.table-bordered.table-hover
+          thead.table-dark
+            tr
+              th.text-center(scope="col" style="width: 80px") Nhóm
+              th(scope="col") Thành viên 1
+              th(scope="col") Thành viên 2
+              th(scope="col") Tên đề tài
+              th.text-center(scope="col" style="width: 200px") Hành động
+          tbody
+            each row in rows
+              tr
+                td.text-center 
+                  if row.group === "Không có nhóm"
+                    span.text-muted -
+                  else
+                    strong #{row.group}
+                td #{row.sv1 ? `${row.sv1.ten} (${row.sv1.msvv})` : ""}
+                td #{row.sv2 ? `${row.sv2.ten} (${row.sv2.msvv})` : ""}
+                td
+                  if row.detai
+                    strong #{row.detai.ten}
+                    // HIỂN THỊ CẢNH BÁO NẾU ĐÃ CÓ ĐÁNH GIÁ GK
+                    if row.hasDanhGia
+                      small.d-block.text-danger
+                        i.fas.fa-exclamation-triangle.mr-1
+                        | Đã có đánh giá GK
+                  else
+                    span.text-muted Chưa có đề tài
+                td.text-center
+                  if row.detai
+                    a.btn.btn-info.btn-sm.me-1(href=`/giangvien/detai/detail/${row.detai._id}`) Chi tiết
+                    
+                    // KIỂM TRA: NẾU ĐÃ CÓ ĐÁNH GIÁ GK THÌ ẨN NÚT SỬA
+                    if !row.hasDanhGia
+                      a.btn.btn-warning.btn-sm.me-1(href=`/giangvien/detai/edit/${row.detai._id}`) Sửa
+                    else
+                      // Hoặc có thể để button disabled
+                      // button.btn.btn-secondary.btn-sm.me-1(disabled) Đã khóa
+                    
+                    a.btn.btn-secondary.btn-sm(href=`/giangvien/detai/export/${row.detai._id}` target="_blank") Export
+                  else
+                    a.btn.btn-success.btn-sm(href=`/giangvien/detai/create?group=${row.group}`) + Tạo đề tài
+    else
+      .text-center.py-5
+        p.text-muted Không có dữ liệu

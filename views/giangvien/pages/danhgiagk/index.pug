@@ -1,30 +1,75 @@
 extends ../../layouts/default.pug
 
 block main
-  h3.text-primary ĐÁNH GIÁ GIỮA KỲ
+  .container-fluid
+    .d-flex.justify-content-between.align-items-center.mb-4
+      h3.mb-0 Đánh giá giữa kỳ
+      .dropdown.ml-auto
+        button.btn.btn-outline-primary.dropdown-toggle(type="button" data-toggle="dropdown")
+          | Lọc
+        .dropdown-menu.dropdown-menu-right
+          a.dropdown-item(href="?filter=all") Tất cả
+          a.dropdown-item(href="?filter=chua") Chưa đánh giá
+          a.dropdown-item(href="?filter=dadanhgia") Đã đánh giá
 
-  table.table.table-bordered
-    thead
-      tr
-        th MSSV
-        th Họ tên
-        th Lớp
-        th Đề tài
-        th Nhóm
-        th Điểm giữa kỳ
-        th Kết quả
-        th Hành động
-
-    tbody
-      each row in rows
-        tr
-          td= row.sv.msvv
-          td= row.sv.ten
-          td= row.sv.lop
-          td= row.detai ? row.detai.ten : "Chưa có"
-          td= row.sv.group || ""
-          td= row.dg ? row.dg.diem + "%" : "Chưa có"
-          td= row.dg ? row.dg.ketqua : "Chưa đánh giá"
-          td
-            a.btn.btn-sm.btn-info(href=`/giangvien/danhgiagk/form/${row.sv._id}`)
-              | #{row.dg ? "Sửa" : "Đánh giá"}
+    if rows.length
+      .table-responsive
+        table.table.table-bordered.table-hover
+          thead.table-dark
+            tr
+              th.text-center(scope="col" style="width: 80px") Nhóm
+              th(scope="col") MSSV
+              th(scope="col") Họ tên
+              th(scope="col") Lớp
+              th(scope="col") Đề tài
+              th.text-center(scope="col" style="width: 100px") Điểm
+              th.text-center(scope="col" style="width: 120px") Kết quả
+              th.text-center(scope="col" style="width: 120px") Hành động
+          tbody
+            each row in rows
+              tr
+                td.text-center
+                  if row.sv.group
+                    strong #{row.sv.group}
+                  else
+                    span.text-muted -
+                td #{row.sv.msvv}
+                td #{row.sv.ten}
+                td #{row.sv.lop}
+                td
+                  if row.detai
+                    strong #{row.detai.ten}
+                  else
+                    span.text-muted Chưa có
+                td.text-center
+                  if row.dg
+                    .fw-bold(class=row.dg.diem >= 50 ? 'text-success' : 'text-danger' style="font-size: 16px;") #{row.dg.diem}%
+                  else
+                    span.text-muted -
+                td.text-center
+                  if row.dg
+                    if row.dg.ketqua === "Đạt"
+                      .fw-bold.text-success(style="font-size: 16px;") Đạt
+                    else if row.dg.ketqua === "Không đạt"
+                      .fw-bold.text-danger(style="font-size: 16px;") Không đạt
+                    else
+                      .fw-bold.text-secondary(style="font-size: 16px;") #{row.dg.ketqua}
+                  else
+                    .fw-bold.text-warning(style="font-size: 16px;") Chưa đánh giá
+                td.text-center
+                  //- Dựa vào buttonType để hiển thị nút phù hợp
+                  if row.buttonType === "view"
+                    a.btn.btn-sm.btn-info(href=`/giangvien/danhgiagk/form/${row.sv._id}`)
+                      i.bi.bi-eye.me-1
+                      | Xem
+                  else if row.buttonType === "edit"
+                    a.btn.btn-sm.btn-warning(href=`/giangvien/danhgiagk/form/${row.sv._id}`)
+                      i.bi.bi-pencil.me-1
+                      | Sửa
+                  else
+                    a.btn.btn-sm.btn-success(href=`/giangvien/danhgiagk/form/${row.sv._id}`)
+                      i.bi.bi-plus-circle.me-1
+                      | Đánh giá
+    else
+      .text-center.py-5
+        p.text-muted Không có dữ liệu sinh viên

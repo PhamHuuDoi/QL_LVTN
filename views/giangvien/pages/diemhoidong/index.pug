@@ -1,44 +1,100 @@
 extends ../../layouts/default.pug
 
 block main
-  h3.text-primary.mb-3 NHẬP ĐIỂM HỘI ĐỒNG
+  h3.text-primary NHẬP ĐIỂM HỘI ĐỒNG
 
-  table.table.table-bordered.table-sm
-    thead.thead-light
-      tr
-        th Nhóm
-        th MSSV
-        th Tên SV
-        th Đề tài
-        th Hội đồng
-        th Điểm
-        th Lưu
-    tbody
-      if rows.length
-        each r in rows
-          tr
-            td.text-center= r.group || "—"
-            td= r.sv.msvv
-            td= r.sv.ten
-            td= r.detai ? r.detai.ten : "—"
-            td= r.hoidong ? r.hoidong.tenhd : "—"
+  .d-flex.justify-content-between.align-items-center.mb-3
+    h5.mb-0 Danh sách sinh viên cần chấm điểm
+    .dropdown
+      button.btn.btn-outline-primary.btn-sm.dropdown-toggle(type="button" data-toggle="dropdown")
+        | Lọc theo điểm
+      ul.dropdown-menu.dropdown-menu-right
+        li
+          a.dropdown-item(href="?filter=all") Tất cả
+        li
+          a.dropdown-item(href="?filter=yes") Đã có điểm
+        li
+          a.dropdown-item(href="?filter=no") Chưa có điểm
 
-            // 👉 Gộp input + button trong cùng form
-            td(colspan="2")
-              form.d-flex(
-                method="POST",
-                action=`/giangvien/diemhoidong/save/${r.pcId}/${r.svKey}`
-              )
-                input.form-control.form-control-sm.mr-2(
-                  type="number",
-                  step="0.1",
-                  min="0",
-                  max="10",
-                  name="diem",
-                  value=(r.diem || "")
-                )
-                button.btn.btn-sm.btn-success(type="submit") Lưu
-      else
+  if rows.length
+    table.table.table-bordered.table-hover
+      thead.table-dark
         tr
-          td(colspan="7", class="text-center text-muted")
-            | Chưa có sinh viên nào cần nhập điểm.
+          th.text-center(style="width: 80px") Nhóm
+          th MSSV
+          th Họ tên
+          th Lớp
+          th Đề tài
+          th Hội đồng
+          th Điểm HD
+          th Hành động
+      tbody
+        each row in rows
+          tr
+            // Nhóm
+            td.text-center
+              if row.sv.group
+                strong #{row.sv.group}
+              else
+                span.text-muted -
+            
+            // MSSV
+            td #{row.sv.msvv}
+            
+            // Họ tên
+            td #{row.sv.ten}
+            
+            // Lớp
+            td #{row.sv.lop}
+            
+            // Đề tài
+            td
+              if row.detai
+                strong #{row.detai.ten}
+              else
+                span.text-muted Chưa có
+            
+            // Hội đồng
+            td
+              if row.hoidong
+                strong.text-info #{row.hoidong.tenhd || row.hoidong.ma}
+              else
+                span.text-muted -
+            
+            // Điểm HD
+            td.text-center
+              if row.diem && row.diem > 0
+                strong.text-primary #{row.diem}
+              else
+                span.text-muted Chưa có
+            
+            // Hành động - Form nhập điểm
+            td.text-center
+              form.d-inline(action=`/giangvien/diemhoidong/save/${row.pcId}/${row.svKey}`, method="POST")
+                .input-group.input-group-sm
+                  input.form-control(
+                    type="number",
+                    step="0.1",
+                    min="0",
+                    max="10",
+                    name="diem",
+                    value=(row.diem || ""),
+                    placeholder="0-10",
+                    style="width: 80px"
+                  )
+                  .input-group-append
+                    button.btn.btn-sm.btn-success(type="submit") Lưu
+  else
+    .text-center.py-5
+      p.text-muted Không có sinh viên nào cần chấm điểm hội đồng
+
+  // CSS nội tuyến cho responsive
+  style.
+    @media (max-width: 768px) {
+      .input-group {
+        flex-wrap: nowrap;
+      }
+      .input-group input {
+        min-width: 60px;
+      }
+    }

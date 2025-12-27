@@ -1,65 +1,160 @@
 extends ../../layouts/default.pug
 
 block main
-  h3.text-primary Đánh giá giữa kỳ
+  if isViewMode
+    h3.text-primary.mb-4 Xem đánh giá giữa kỳ
+  else if hasEvaluation
+    h3.text-primary.mb-4 Sửa đánh giá giữa kỳ
+  else
+    h3.text-primary.mb-4 Đánh giá giữa kỳ
 
-  form(method="POST", action="/giangvien/danhgiagk/save")
-    input(type="hidden", name="sv_id", value=sv._id)
-    input(type="hidden", name="detai_id", value=(detai ? detai._id : ""))
+  if isViewMode
+    // CHẾ ĐỘ XEM - THIẾT KẾ ĐẸP HƠN
+    .card.border-0.shadow
+      .card-header.bg-primary.text-white
+        h5.mb-0 Thông tin đánh giá
+      .card-body
+        .row.mb-4
+          .col-md-6.mb-3
+            .info-box.p-3.bg-light.rounded
+              h6.text-muted.mb-2 Sinh viên
+              h5.font-weight-bold.text-dark #{sv.ten} (#{sv.msvv})
+          .col-md-6.mb-3
+            .info-box.p-3.bg-light.rounded
+              h6.text-muted.mb-2 Đề tài
+              h5.font-weight-bold.text-dark #{detai ? detai.ten : "Chưa có đề tài"}
+        
+        .row.mb-4
+          .col-md-4.mb-3
+            .info-box.p-3.bg-light.rounded
+              h6.text-muted.mb-2 Điểm giữa kỳ
+              h4.font-weight-bold.text-primary #{dg && dg.diem ? dg.diem : "0"}%
+              small.text-muted (Phần trăm)
+          
+          .col-md-4.mb-3
+            .info-box.p-3.bg-light.rounded
+              h6.text-muted.mb-2 Kết quả
+              - var badgeClass = "badge-primary"
+              - if (dg && dg.ketqua === "Làm tiếp") badgeClass = "badge-success"
+              - if (dg && dg.ketqua === "Cảnh cáo") badgeClass = "badge-warning"
+              - if (dg && dg.ketqua === "Đình chỉ") badgeClass = "badge-danger"
+              span.badge(class=badgeClass, style="font-size: 1rem; padding: 8px 12px;")
+                | #{dg && dg.ketqua ? dg.ketqua : "Chưa đánh giá"}
+          
+          .col-md-4.mb-3
+            .info-box.p-3.bg-light.rounded
+              h6.text-muted.mb-2 Trạng thái
+              span.badge.badge-info(style="font-size: 1rem; padding: 8px 12px;")
+                | Chỉ xem
+              p.text-muted.mt-2.mb-0
+                small Đã có điểm hướng dẫn/phản biện
+        
+        .row
+          .col-12
+            .info-box.p-3.bg-light.rounded
+              h6.text-muted.mb-3 Nhận xét
+              .p-3.bg-white.rounded.border
+                if dg && dg.nhanxet
+                  | #{dg.nhanxet}
+                else
+                  .text-muted.font-italic Không có nhận xét
 
-    .form-group
-      label Sinh viên
-      input.form-control(
-        type="text",
-        readonly,
-        value=`${sv.ten} (${sv.msvv})`
-      )
+      .card-footer.bg-light.d-flex.justify-content-between
+        a.btn.btn-secondary(href="/giangvien/danhgiagk")
+          i.fas.fa-arrow-left.mr-2
+          | Quay lại danh sách
+        span.text-muted
+          i.fas.fa-lock.mr-1
+          | Đánh giá đã được khóa
 
-    .form-group
-      label Đề tài
-      input.form-control(
-        type="text",
-        readonly,
-        value=(detai ? detai.ten : "Chưa có")
-      )
+  else
+    // CHẾ ĐỘ TẠO MỚI HOẶC SỬA
+    .card.border-0.shadow
+      .card-header.bg-primary.text-white
+        h5.mb-0 #{hasEvaluation ? 'Cập nhật đánh giá' : 'Tạo đánh giá mới'}
+      .card-body
+        form(method="POST", action="/giangvien/danhgiagk/save")
+          input(type="hidden", name="sv_id", value=sv._id)
+          input(type="hidden", name="detai_id", value=(detai ? detai._id : ""))
 
-    .form-group
-      label Điểm giữa kỳ (%)
-      input.form-control(
-        type="number",
-        name="diem",
-        min="0",
-        max="100",
-        value=(dg && dg.diem ? dg.diem : "")
-      )
+          .row
+            .col-md-6
+              .form-group
+                label.font-weight-bold Sinh viên
+                input.form-control(
+                  type="text",
+                  readonly,
+                  value=`${sv.ten} (${sv.msvv})`
+                )
+            
+            .col-md-6
+              .form-group
+                label.font-weight-bold Đề tài
+                input.form-control(
+                  type="text",
+                  readonly,
+                  value=(detai ? detai.ten : "Chưa có")
+                )
 
-    .form-group
-      label Kết quả
-      select.form-control(name="ketqua")
-        option(
-          value="Làm tiếp",
-          selected=(dg && dg.ketqua === "Làm tiếp")
-        ) Làm tiếp
+          .row
+            .col-md-6
+              .form-group
+                label.font-weight-bold Điểm giữa kỳ (%)
+                input.form-control(
+                  type="number",
+                  name="diem",
+                  min="0",
+                  max="100",
+                  value=(dg && dg.diem ? dg.diem : ""),
+                  required=true,
+                  placeholder="Nhập điểm từ 0-100"
+                )
+                small.form-text.text-muted Điểm tính theo phần trăm (0-100%)
+            
+            .col-md-6
+              .form-group
+                label.font-weight-bold Kết quả
+                select.form-control(name="ketqua", required=true)
+                  option(value="", disabled selected=!dg || !dg.ketqua) -- Chọn kết quả --
+                  option(
+                    value="Làm tiếp",
+                    selected=(dg && dg.ketqua === "Làm tiếp")
+                  ) Làm tiếp
+                  option(
+                    value="Cảnh cáo",
+                    selected=(dg && dg.ketqua === "Cảnh cáo")
+                  ) Cảnh cáo
+                  option(
+                    value="Đình chỉ",
+                    selected=(dg && dg.ketqua === "Đình chỉ")
+                  ) Đình chỉ
+                  option(
+                    value="Chưa đánh giá",
+                    selected=(!dg || dg.ketqua === "Chưa đánh giá")
+                  ) Chưa đánh giá
 
-        option(
-          value="Cảnh cáo",
-          selected=(dg && dg.ketqua === "Cảnh cáo")
-        ) Cảnh cáo
+          .form-group
+            label.font-weight-bold Nhận xét
+            textarea.form-control(
+              name="nhanxet",
+              rows="5",
+              placeholder="Nhập nhận xét chi tiết về sinh viên..."
+            ) #{dg && dg.nhanxet ? dg.nhanxet : ""}
+            small.form-text.text-muted Ghi lại những điểm mạnh, điểm cần cải thiện của sinh viên
 
-        option(
-          value="Đình chỉ",
-          selected=(dg && dg.ketqua === "Đình chỉ")
-        ) Đình chỉ
+          .d-flex.justify-content-between.mt-4
+            a.btn.btn-secondary(href="/giangvien/danhgiagk")
+              i.fas.fa-arrow-left.mr-2
+              | Quay lại
+            if hasEvaluation
+              button.btn.btn-warning(type="submit")
+                i.fas.fa-save.mr-2
+                | Cập nhật đánh giá
+            else
+              button.btn.btn-success(type="submit")
+                i.fas.fa-check.mr-2
+                | Lưu đánh giá
 
-        option(
-          value="Chưa đánh giá",
-          selected=(!dg || dg.ketqua === "Chưa đánh giá")
-        ) Chưa đánh giá
-
-    .form-group
-      label Nhận xét
-      textarea.form-control(name="nhanxet")
-        | #{dg && dg.nhanxet ? dg.nhanxet : ""}
-
-    button.btn.btn-success(type="submit") Lưu đánh giá
-    a.btn.btn-secondary(href="/giangvien/danhgiagk") Quay lại
+  // Thêm Font Awesome cho icon nếu chưa có
+  if !isViewMode
+    link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css")

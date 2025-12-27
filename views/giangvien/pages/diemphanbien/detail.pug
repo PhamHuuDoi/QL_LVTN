@@ -1,0 +1,110 @@
+extends ../../layouts/default.pug
+
+block main
+  .container-fluid
+    h3.text-primary CHI TIẾT ĐIỂM PHẢN BIỆN
+
+    .card.mb-3
+      .card-body
+        .form-group
+          label Đề tài
+          input.form-control(type="text", readonly, value=detai.ten)
+
+        hr
+        h5.text-info Thông tin sinh viên
+
+        .row
+          .col-md-6
+            strong SV 01:
+            p #{detai.sv1.ten} (#{detai.sv1.msvv}) - Lớp #{detai.sv1.lop}
+          if detai.sv2
+            .col-md-6
+              strong SV 02:
+              p #{detai.sv2.ten} (#{detai.sv2.msvv}) - Lớp #{detai.sv2.lop}
+
+        hr
+        h5.text-info Điểm từng tiêu chí (0 - 2.5)
+
+        table.table.table-bordered
+          thead
+            tr
+              th Tiêu chí
+              th SV 01
+              if detai.sv2
+                th SV 02
+          tbody
+            tr
+              td Phân tích vấn đề
+              td #{dpb && dpb.sv1 && dpb.sv1.phanTichVanDe ? dpb.sv1.phanTichVanDe : 0}
+              if detai.sv2
+                td #{dpb && dpb.sv2 && dpb.sv2.phanTichVanDe ? dpb.sv2.phanTichVanDe : 0}
+
+            tr
+              td Thiết kế vấn đề
+              td #{dpb && dpb.sv1 && dpb.sv1.thietKeVanDe ? dpb.sv1.thietKeVanDe : 0}
+              if detai.sv2
+                td #{dpb && dpb.sv2 && dpb.sv2.thietKeVanDe ? dpb.sv2.thietKeVanDe : 0}
+
+            tr
+              td Hiện thực vấn đề
+              td #{dpb && dpb.sv1 && dpb.sv1.hienThucVanDe ? dpb.sv1.hienThucVanDe : 0}
+              if detai.sv2
+                td #{dpb && dpb.sv2 && dpb.sv2.hienThucVanDe ? dpb.sv2.hienThucVanDe : 0}
+
+            tr
+              td Kiểm tra sản phẩm
+              td #{dpb && dpb.sv1 && dpb.sv1.kiemTraSanPham ? dpb.sv1.kiemTraSanPham : 0}
+              if detai.sv2
+                td #{dpb && dpb.sv2 && dpb.sv2.kiemTraSanPham ? dpb.sv2.kiemTraSanPham : 0}
+
+        hr
+        h5.text-info Tổng điểm & Đề nghị
+
+        .row
+          .col-md-6
+            h6 SV 01
+            p 
+              strong Tổng điểm: 
+              | #{dpb && dpb.sv1 && dpb.sv1.tongDiem ? dpb.sv1.tongDiem : 0}/10
+            p 
+              strong Đề nghị: 
+              | #{dpb && dpb.sv1 && dpb.sv1.deNghi ? dpb.sv1.deNghi : "Không có"}
+          
+          if detai.sv2
+            .col-md-6
+              h6 SV 02
+              p 
+                strong Tổng điểm: 
+                | #{dpb && dpb.sv2 && dpb.sv2.tongDiem ? dpb.sv2.tongDiem : 0}/10
+              p 
+                strong Đề nghị: 
+                | #{dpb && dpb.sv2 && dpb.sv2.deNghi ? dpb.sv2.deNghi : "Không có"}
+
+        hr
+        h5.text-info Nhận xét chung cho nhóm
+
+        .form-group
+          label Nhận xét chung
+          input.form-control(type="text", readonly, value=dpb && dpb.nhanXetChung ? dpb.nhanXetChung : "Không có")
+
+        .form-group
+          label Yêu cầu điều chỉnh
+          textarea.form-control(readonly, rows="2") #{dpb && dpb.yeuCauDieuChinh ? dpb.yeuCauDieuChinh : "Không có"}
+
+        .form-group
+          label Ưu điểm
+          textarea.form-control(readonly, rows="2") #{dpb && dpb.uuDiem ? dpb.uuDiem : "Không có"}
+
+        .form-group
+          label Thiếu sót
+          textarea.form-control(readonly, rows="2") #{dpb && dpb.thieuSot ? dpb.thieuSot : "Không có"}
+
+        .form-group
+          label Câu hỏi cho hội đồng
+          textarea.form-control(readonly, rows="3") 
+            | #{dpb && dpb.cauHoiHoiDong ? dpb.cauHoiHoiDong.join("\n") : "Không có"}
+
+    .d-flex.justify-content-between
+      a.btn.btn-secondary(href="/giangvien/diemphanbien") ← Quay lại
+      if dpb
+        a.btn.btn-success(href=`/giangvien/diemphanbien/export/${pc._id}` target="_blank") Xuất Word

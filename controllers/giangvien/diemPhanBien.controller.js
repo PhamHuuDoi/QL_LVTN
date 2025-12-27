@@ -6,13 +6,13 @@ const Docxtemplater = require("docxtemplater");
 
 const PhanCongPB = require("../../models/phancongphanbien.model");
 const DiemPB = require("../../models/diemPhanBien.model");
-
+const DsNhomHoiDong = require("../../models/dsnhomHd.model");
 // helper tick
 const tick = (val, expect) => (val === expect ? "☑" : "☐");
 
-// =============================
+
 // LIST
-// =============================
+
 module.exports.list = async (req, res) => {
   try {
     const gvId = req.session.user?._id;
@@ -42,22 +42,49 @@ module.exports.list = async (req, res) => {
       // lấy group từ SV
       const group = dt.sv1?.group || dt.sv2?.group || "—";
 
-      // console.log("SV1 group:", dt.sv1?.group);
-      // console.log("SV2 group:", dt.sv2?.group);
       const dpb = await DiemPB.findOne({
         phancongphanbien_id: pc._id,
       }).lean();
+
+      // KIỂM TRA XEM SINH VIÊN ĐÃ ĐƯỢC PHÂN CÔNG HỘI ĐỒNG CHƯA
+      let daPhanCongHD = false;
+      if (dt.sv1 || dt.sv2) {
+        const svIds = [];
+        if (dt.sv1) svIds.push(dt.sv1._id);
+        if (dt.sv2) svIds.push(dt.sv2._id);
+
+        if (svIds.length > 0) {
+          const dsHoiDong = await DsNhomHoiDong.findOne({
+            $or: [{ sv1: { $in: svIds } }, { sv2: { $in: svIds } }],
+          });
+          daPhanCongHD = !!dsHoiDong;
+        }
+      }
 
       rows.push({
         pc,
         detai: { ...dt, group },
         dpb,
+        daPhanCongHD, // true = đã phân công hội đồng, false = chưa
       });
     }
-
+    // Lọc theo filter
+    const filter = req.query.filter || "all";
+    let filteredRows = rows;
+    if (filter === "yes") {
+      filteredRows = rows.filter((r) => r.dpb && ( (r.dpb.sv1 && r.dpb.sv1.tongDiem > 0) || (r.dpb.sv2 && r.dpb.sv2.tongDiem > 0) ) );
+    } else if (filter === "no") {
+      filteredRows = rows.filter((r) => !r.dpb || ( (!r.dpb.sv1 || r.dpb.sv1.tongDiem === 0) && (!r.dpb.sv2 || r.dpb.sv2.tongDiem === 0) ) );
+    }
+    // Sắp xếp theo nhóm
+    filteredRows.sort((a, b) => {
+      const groupA = a.detai.group || "";
+      const groupB = b.detai.group || "";
+      return groupA.localeCompare(groupB);
+    });
     res.render("giangvien/pages/diemphanbien/index", {
       pageTitle: "Nhập điểm phản biện",
-      rows,
+      rows: filteredRows,
       success: req.flash("success"),
       error: req.flash("error"),
     });
@@ -68,9 +95,8 @@ module.exports.list = async (req, res) => {
   }
 };
 
-// =============================
 // FORM
-// =============================
+
 module.exports.form = async (req, res) => {
   try {
     const { pcId } = req.params;
@@ -115,9 +141,9 @@ module.exports.form = async (req, res) => {
   }
 };
 
-// =============================
+
 // SAVE
-// =============================
+
 module.exports.save = async (req, res) => {
   try {
     const { phancongphanbien_id } = req.body;
@@ -163,7 +189,7 @@ module.exports.save = async (req, res) => {
       dpb.set(data);
     }
 
-    await dpb.save(); // 👉 để pre("save") tính tongDiem
+    await dpb.save(); 
 
     req.flash(
       "success",
@@ -178,10 +204,73 @@ module.exports.save = async (req, res) => {
     res.redirect("/giangvien/diemphanbien");
   }
 };
+// DETAIL
+module.exports.detail = async (req, res) => {
+  try {
+    const { pcId } = req.params;
 
-// =============================
+    if (!mongoose.Types.ObjectId.isValid(pcId)) {
+      req.flash("error", "ID phân công không hợp lệ!");
+      return res.redirect("/giangvien/diemphanbien");
+    }
+
+    const pc = await PhanCongPB.findById(pcId)
+      .populate({
+        path: "detai_id",
+        populate: [
+          { path: "sv1", model: "Sinhvien" },
+          { path: "sv2", model: "Sinhvien" },
+          { path: "giangvien_id", model: "Giangvien" },
+        ],
+      })
+      .lean();
+
+    if (!pc) {
+      req.flash("error", "Không tìm thấy phân công phản biện!");
+      return res.redirect("/giangvien/diemphanbien");
+    }
+
+    const dpb = await DiemPB.findOne({
+      phancongphanbien_id: pcId,
+    }).lean();
+
+    if (!dpb) {
+      req.flash("error", "Chưa có điểm phản biện!");
+      return res.redirect("/giangvien/diemphanbien");
+    }
+
+    // Tính tổng điểm cho từng sinh viên
+    const tongDiemSV1 =
+      (dpb.sv1?.phanTichVanDe || 0) +
+      (dpb.sv1?.thietKeVanDe || 0) +
+      (dpb.sv1?.hienThucVanDe || 0) +
+      (dpb.sv1?.kiemTraSanPham || 0);
+
+    const tongDiemSV2 =
+      (dpb.sv2?.phanTichVanDe || 0) +
+      (dpb.sv2?.thietKeVanDe || 0) +
+      (dpb.sv2?.hienThucVanDe || 0) +
+      (dpb.sv2?.kiemTraSanPham || 0);
+
+    res.render("giangvien/pages/diemphanbien/detail", {
+      pageTitle: "Chi tiết điểm phản biện",
+      pc,
+      detai: pc.detai_id,
+      dpb,
+      tongDiemSV1,
+      tongDiemSV2,
+      success: req.flash("success"),
+      error: req.flash("error"),
+    });
+  } catch (err) {
+    console.error(" DETAIL PB:", err);
+    req.flash("error", "Không thể xem chi tiết!");
+    res.redirect("/giangvien/diemphanbien");
+  }
+};
+
 // EXPORT WORD
-// =============================
+
 module.exports.exportWord = async (req, res) => {
   try {
     const { pcId } = req.params;

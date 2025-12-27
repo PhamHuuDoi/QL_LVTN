@@ -1,0 +1,111 @@
+extends ../../layouts/default.pug
+
+block main
+  .container-fluid
+    h3.text-primary.mb-4 CHI TIẾT ĐIỂM HƯỚNG DẪN
+    
+    .card.mb-4
+      .card-header.bg-primary.text-white
+        h5.mb-0 Thông tin sinh viên & đề tài
+      .card-body
+        .row
+          .col-md-6
+            .mb-3
+              strong Sinh viên: 
+              | #{sv.ten} (#{sv.msvv})
+            .mb-3
+              strong Lớp: 
+              | #{sv.lop}
+            .mb-3
+              strong Nhóm: 
+              | #{sv.group || "Không có"}
+          .col-md-6
+            .mb-3
+              strong Đề tài: 
+              | #{detai.ten}
+            .mb-3
+              strong Mô tả: 
+              | #{detai.mota || "Không có mô tả"}
+    
+    .card.mb-4
+      .card-header.bg-info.text-white
+        h5.mb-0 Điểm từng tiêu chí
+      .card-body
+        .row
+          .col-md-3.mb-3
+            .p-3.bg-light.rounded
+              h6.text-muted Phân tích vấn đề
+              h4.font-weight-bold #{dhd.phanTichVanDe || 0}/2.5
+          .col-md-3.mb-3
+            .p-3.bg-light.rounded
+              h6.text-muted Thiết kế vấn đề
+              h4.font-weight-bold #{dhd.thietKeVanDe || 0}/2.5
+          .col-md-3.mb-3
+            .p-3.bg-light.rounded
+              h6.text-muted Hiện thực vấn đề
+              h4.font-weight-bold #{dhd.hienThucVanDe || 0}/2.5
+          .col-md-3.mb-3
+            .p-3.bg-light.rounded
+              h6.text-muted Kiểm tra sản phẩm
+              h4.font-weight-bold #{dhd.kiemTraSanPham || 0}/2.5
+        
+        .row.mt-4
+          .col-12
+            .p-3.bg-primary.text-white.rounded
+              h5.mb-0 Tổng điểm: 
+                span.ml-2 #{tongDiem}/10 (#{Math.round(tongDiem * 10)}%)
+    
+    .card.mb-4
+      .card-header.bg-warning.text-dark
+        h5.mb-0 Nhận xét và đánh giá
+      .card-body
+        .row
+          .col-md-6.mb-3
+            strong Nhận xét chung:
+            .p-3.bg-light.rounded.mt-2
+              | #{dhd.nhanXetChung || "Không có"}
+          
+          .col-md-6.mb-3
+            strong Điểm bằng chữ:
+            .p-3.bg-light.rounded.mt-2
+              | #{dhd.diemBangChu || "Không có"}
+        
+        .row
+          .col-md-6.mb-3
+            strong Ưu điểm:
+            .p-3.bg-light.rounded.mt-2
+              | #{dhd.uuDiem || "Không có"}
+          
+          .col-md-6.mb-3
+            strong Thiếu sót:
+            .p-3.bg-light.rounded.mt-2
+              | #{dhd.thieuSot || "Không có"}
+        
+        .row
+          .col-12.mb-3
+            strong Yêu cầu điều chỉnh:
+            .p-3.bg-light.rounded.mt-2
+              | #{dhd.yeuCauDieuChinh || "Không có"}
+        
+        .row
+          .col-12.mb-3
+            strong Câu hỏi cho hội đồng:
+            .p-3.bg-light.rounded.mt-2
+              if dhd.cauHoiHoiDong && dhd.cauHoiHoiDong.length > 0
+                each cauhoi, index in dhd.cauHoiHoiDong
+                  div #{index + 1}. #{cauhoi}
+              else
+                | Không có câu hỏi
+        
+        .row
+          .col-12.mb-3
+            strong Đề nghị của giảng viên hướng dẫn:
+            .p-3.bg-light.rounded.mt-2
+              | #{dhd.deNghiGV || "Không có"}
+    
+    .d-flex.justify-content-between
+      a.btn.btn-secondary(href="/giangvien/diemhuongdan")
+        | ← Quay lại danh sách
+      .btn-group
+        a.btn.btn-success(href=`/giangvien/diemhuongdan/export/${sv._id}` target="_blank")
+          | Xuất Word

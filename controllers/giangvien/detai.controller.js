@@ -6,11 +6,12 @@ const Docxtemplater = require("docxtemplater");
 
 const DeTai = require("../../models/detai.model");
 const SinhVien = require("../../models/sinhVien.model");
-const GiangVien = require("../../models/giangVien.model");
 
-// =============================
+
 // LIST
-// =============================
+
+const DanhGia = require("../../models/danhGiaGiuaKy.model"); // THÊM DÒNG NÀY
+
 const list = async (req, res) => {
   try {
     let gvId = req.session.user?._id;
@@ -20,9 +21,12 @@ const list = async (req, res) => {
     }
 
     gvId = gvId.toString();
+    const filter = req.query.filter || "all";
 
+    // 1. Lấy tất cả sinh viên của giảng viên này
     const svs = await SinhVien.find({ supervisor: gvId }).lean();
 
+    // 2. Nhóm sinh viên theo nhóm
     const groups = {};
     svs.forEach((sv) => {
       const g = sv.group || "Không có nhóm";
@@ -30,32 +34,92 @@ const list = async (req, res) => {
       groups[g].push(sv);
     });
 
+    // 3. Lấy tất cả đề tài của giảng viên này
     const detais = await DeTai.find({ giangvien_id: gvId })
       .populate({ path: "sv1", model: "Sinhvien" })
       .populate({ path: "sv2", model: "Sinhvien" })
       .lean();
 
+    // 4. Lấy tất cả đánh giá giữa kỳ của giảng viên này
+    const danhgias = await DanhGia.find({ giangvien_id: gvId }).lean();
+
     const rows = [];
 
+    // 5. Duyệt qua từng nhóm để tìm đề tài CHÍNH XÁC
     for (const groupName in groups) {
       const students = groups[groupName];
       const sv1 = students[0] || null;
       const sv2 = students[1] || null;
 
-      const detai = detais.find(
-        (dt) =>
-          dt.sv1?._id?.toString() === sv1?._id?.toString() ||
-          dt.sv2?._id?.toString() === sv1?._id?.toString() ||
-          dt.sv1?._id?.toString() === sv2?._id?.toString() ||
-          dt.sv2?._id?.toString() === sv2?._id?.toString()
-      );
+      // Tìm đề tài CHÍNH XÁC cho nhóm này
+      let detai = null;
+      let hasDanhGia = false; // Biến kiểm tra có đánh giá GK chưa
 
-      rows.push({ group: groupName, sv1, sv2, detai });
+      if (sv1 && sv2) {
+        // Nhóm có 2 sinh viên: tìm đề tài có cả 2
+        detai = detais.find(
+          (dt) =>
+            (dt.sv1 &&
+              dt.sv1._id.toString() === sv1._id.toString() &&
+              dt.sv2 &&
+              dt.sv2._id.toString() === sv2._id.toString()) ||
+            (dt.sv1 &&
+              dt.sv1._id.toString() === sv2._id.toString() &&
+              dt.sv2 &&
+              dt.sv2._id.toString() === sv1._id.toString())
+        );
+
+        // Kiểm tra cả 2 sinh viên đã có đánh giá GK chưa
+        if (detai) {
+          const sv1HasDanhGia = danhgias.some(
+            (d) => d.sv_id && d.sv_id.toString() === sv1._id.toString()
+          );
+          const sv2HasDanhGia = danhgias.some(
+            (d) => d.sv_id && d.sv_id.toString() === sv2._id.toString()
+          );
+          // Nếu 1 trong 2 sinh viên đã có đánh giá thì không cho sửa đề tài
+          hasDanhGia = sv1HasDanhGia || sv2HasDanhGia;
+        }
+      } else if (sv1) {
+        // Nhóm chỉ có 1 sinh viên: tìm đề tài có sv1
+        detai = detais.find(
+          (dt) =>
+            (dt.sv1 && dt.sv1._id.toString() === sv1._id.toString()) ||
+            (dt.sv2 && dt.sv2._id.toString() === sv1._id.toString())
+        );
+
+        // Kiểm tra sinh viên đã có đánh giá GK chưa
+        if (detai) {
+          hasDanhGia = danhgias.some(
+            (d) => d.sv_id && d.sv_id.toString() === sv1._id.toString()
+          );
+        }
+      }
+
+      // Nếu không tìm thấy đề tài chính xác, để null
+      if (!detai) {
+        detai = null;
+      }
+
+      rows.push({
+        group: groupName,
+        sv1,
+        sv2,
+        detai,
+        hasDanhGia, // true = đã có đánh giá GK, false = chưa có
+      });
+    }
+
+    let filteredRows = rows;
+    if (filter === "hasDetai") {
+      filteredRows = rows.filter((row) => row.detai);
+    } else if (filter === "noDetai") {
+      filteredRows = rows.filter((row) => !row.detai);
     }
 
     res.render("giangvien/pages/detai/index", {
       pageTitle: "Quản lý Đề tài",
-      rows,
+      rows: filteredRows,
       success: req.flash("success"),
       error: req.flash("error"),
     });
@@ -65,10 +129,8 @@ const list = async (req, res) => {
     res.redirect("/giangvien/detai");
   }
 };
-
-// =============================
 // FORM CREATE
-// =============================
+
 const formCreate = async (req, res) => {
   try {
     const today = new Date().toISOString().split("T")[0];

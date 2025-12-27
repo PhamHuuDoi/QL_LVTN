@@ -6,14 +6,10 @@ router.use(authMiddleware.requireGiangVien);
 
 router.get(
   "/",
-  (req, res, next) => {
-    console.log("✅ ROUTE /giangvien/diemphanbien ĐÃ CHẠY");
-    next();
-  },
   ctrl.list
 );
 router.get("/form/:pcId", ctrl.form);
 router.post("/save", ctrl.save);
 router.get("/export/:pcId", ctrl.exportWord);
-
+router.get("/detail/:pcId", ctrl.detail);
 module.exports = router;

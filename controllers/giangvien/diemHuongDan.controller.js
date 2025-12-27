@@ -8,9 +8,8 @@ const DeTai = require("../../models/detai.model");
 const SinhVien = require("../../models/sinhVien.model");
 const DanhGia = require("../../models/danhGiaGiuaKy.model");
 const DiemHD = require("../../models/diemHuongDan.model");
-// =============================
-// LIST: SV GK = "Làm tiếp"
-// =============================
+const DsNhomHoiDong=require("../../models/dsnhomHd.model");
+// List
 const list = async (req, res) => {
   try {
     const gvId = req.session.user?._id;
@@ -30,6 +29,11 @@ const list = async (req, res) => {
     const detais = await DeTai.find({ giangvien_id: gvId }).lean();
     const diemhds = await DiemHD.find({ sv_id: { $in: svIds } }).lean();
 
+    // LẤY DANH SÁCH SINH VIÊN ĐÃ ĐƯỢC PHÂN CÔNG HỘI ĐỒNG
+    const dsHoiDongs = await DsNhomHoiDong.find({
+      $or: [{ sv1: { $in: svIds } }, { sv2: { $in: svIds } }],
+    }).lean();
+
     const rows = svs.map((sv) => {
       const detai =
         detais.find(
@@ -41,12 +45,37 @@ const list = async (req, res) => {
       const dhd =
         diemhds.find((d) => d.sv_id.toString() === sv._id.toString()) || null;
 
-      return { sv, detai, dhd };
-    });
+      // KIỂM TRA XEM SINH VIÊN ĐÃ ĐƯỢC PHÂN CÔNG HỘI ĐỒNG CHƯA
+      const daPhanCongHD = dsHoiDongs.some(
+        (hd) =>
+          (hd.sv1 && hd.sv1.toString() === sv._id.toString()) ||
+          (hd.sv2 && hd.sv2.toString() === sv._id.toString())
+      );
 
+      return {
+        sv,
+        detai,
+        dhd,
+        daPhanCongHD, // true = đã phân công hội đồng, false = chưa
+      };
+    });
+    // Loc theo filter
+    const filter = req.query.filter || "all";
+    let filteredRows = rows;
+    if (filter === "yes") {
+      filteredRows = rows.filter((r) => r.dhd && r.dhd.tongDiem > 0);
+    } else if (filter === "no") {
+      filteredRows = rows.filter((r) => !r.dhd || r.dhd.tongDiem === 0);
+    } 
+    // Sắp xep theo nhóm
+    filteredRows.sort((a, b) => {
+      const groupA = a.sv.group || "";
+      const groupB = b.sv.group || "";
+      return groupA.localeCompare(groupB);
+    });
     res.render("giangvien/pages/diemhuongdan/index", {
       pageTitle: "Nhập điểm hướng dẫn",
-      rows,
+      rows: filteredRows,
       success: req.flash("success"),
       error: req.flash("error"),
     });
@@ -162,9 +191,62 @@ const save = async (req, res) => {
   }
 };
 
-// =============================
+// Xem chi tiết điểm hướng dẫn
+const detail = async (req, res) => {
+  try {
+    const { svId } = req.params;
+    const gvId = req.session.user._id;
+
+    if (!mongoose.Types.ObjectId.isValid(svId)) {
+      req.flash("error", "ID sinh viên không hợp lệ!");
+      return res.redirect("/giangvien/diemhuongdan");
+    }
+
+    const sv = await SinhVien.findById(svId).lean();
+    const detai = await DeTai.findOne({
+      giangvien_id: gvId,
+      $or: [{ sv1: svId }, { sv2: svId }],
+    }).lean();
+
+    if (!sv || !detai) {
+      req.flash("error", "Không tìm thấy sinh viên hoặc đề tài!");
+      return res.redirect("/giangvien/diemhuongdan");
+    }
+
+    const dhd = await DiemHD.findOne({
+      sv_id: svId,
+      detai_id: detai._id,
+    });
+
+    if (!dhd) {
+      req.flash("error", "Sinh viên chưa có điểm hướng dẫn!");
+      return res.redirect("/giangvien/diemhuongdan");
+    }
+
+    // Tính tổng điểm
+    const tongDiem =
+      (dhd.phanTichVanDe || 0) +
+      (dhd.thietKeVanDe || 0) +
+      (dhd.hienThucVanDe || 0) +
+      (dhd.kiemTraSanPham || 0);
+
+    res.render("giangvien/pages/diemhuongdan/detail", {
+      pageTitle: "Chi tiết điểm hướng dẫn",
+      sv,
+      detai,
+      dhd,
+      tongDiem,
+      success: req.flash("success"),
+      error: req.flash("error"),
+    });
+  } catch (err) {
+    console.error("Lỗi detail:", err);
+    req.flash("error", "Không thể xem chi tiết!");
+    res.redirect("/giangvien/diemhuongdan");
+  }
+};
+
 // EXPORT WORD (theo SV)
-// =============================
 const exportWord = async (req, res) => {
   try {
     const { svId } = req.params;
@@ -258,5 +340,6 @@ module.exports = {
   list,
   form,
   save,
+  detail,
   exportWord,
 };
