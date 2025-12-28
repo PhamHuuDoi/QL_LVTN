@@ -1,7 +1,7 @@
 const SinhVien = require("../../models/sinhVien.model");
 const GiangVien = require("../../models/giangVien.model");
 const DeTai = require("../../models/detai.model");
-
+const PhanCongHuongDan = require("../../models/phanCongHuongDan.model");
 // [GET] /admin/phancong
 module.exports.index = async (req, res) => {
   try {
@@ -113,8 +113,20 @@ module.exports.assign = async (req, res) => {
     }
 
     // Cập nhật supervisor cho tất cả sinh viên trong cùng nhóm
-    await SinhVien.updateMany({ group }, { supervisor: gvid });
-
+    await SinhVien.updateMany({ group }, { supervisor: gvid });  
+    // Lưu cập nhật bảng phân công hướng dẫn cho từng SV trong nhóm
+    for (let svItem of svsInGroup) {
+      await PhanCongHuongDan.findOneAndUpdate(
+        { svid: svItem._id }, // nếu SV đã có phân công thì update
+        {
+          gvid,
+          svid: svItem._id,
+          group,
+          trangthai: "Đang hướng dẫn",
+        },
+        { upsert: true, new: true } // chưa có thì tạo mới
+      );
+    }
     // Cập nhật role giảng viên
     const gv = await GiangVien.findById(gvid);
     if (gv) {
