@@ -3,7 +3,7 @@ const DeTai = require("../../models/detai.model");
 const DanhGia = require("../../models/danhGiaGiuaKy.model");
 const DiemHuongDan = require("../../models/diemHuongDan.model");
 const DiemPhanBien = require("../../models/diemPhanBien.model");
-const PhanCongPhanBien = require("../../models/phanCongPhanBien.model");
+const PhanCongPhanBien = require("../../models/phancongphanbien.model");
 
 // LIST
 
@@ -48,19 +48,27 @@ const list = async (req, res) => {
       const diemPB = diemPBs.find(
         (d) => d.sv_id && d.sv_id.toString() === sv._id.toString()
       );
-      
+
       if (diemPB) {
         // Kiểm tra sinh viên có trong điểm PB không
-        if (diemPB.sv1 && diemPB.sv1.sv_id && diemPB.sv1.sv_id.toString() === sv._id.toString()) {
+        if (
+          diemPB.sv1 &&
+          diemPB.sv1.sv_id &&
+          diemPB.sv1.sv_id.toString() === sv._id.toString()
+        ) {
           hasDiemPB = diemPB.sv1.tongDiem > 0 || diemPB.sv1.phanTichVanDe > 0;
-        } else if (diemPB.sv2 && diemPB.sv2.sv_id && diemPB.sv2.sv_id.toString() === sv._id.toString()) {
+        } else if (
+          diemPB.sv2 &&
+          diemPB.sv2.sv_id &&
+          diemPB.sv2.sv_id.toString() === sv._id.toString()
+        ) {
           hasDiemPB = diemPB.sv2.tongDiem > 0 || diemPB.sv2.phanTichVanDe > 0;
         }
       }
 
       // XÁC ĐỊNH TRẠNG THÁI NÚT
       let buttonType = "create";
-      
+
       if (dg) {
         // ĐÃ CÓ ĐÁNH GIÁ
         if (hasDiemHD || hasDiemPB) {
@@ -138,20 +146,25 @@ const form = async (req, res) => {
 
     // Kiểm tra có điểm phản biện không
     let hasDiemPB = false;
-    
+
     // Tìm điểm phản biện của sinh viên này
     const diemPB = await DiemPhanBien.findOne({
-      $or: [
-        { "sv1.sv_id": svId },
-        { "sv2.sv_id": svId }
-      ]
+      $or: [{ "sv1.sv_id": svId }, { "sv2.sv_id": svId }],
     }).lean();
 
     if (diemPB) {
       // Kiểm tra sinh viên này có trong điểm phản biện và đã có điểm
-      if (diemPB.sv1 && diemPB.sv1.sv_id && diemPB.sv1.sv_id.toString() === svId) {
+      if (
+        diemPB.sv1 &&
+        diemPB.sv1.sv_id &&
+        diemPB.sv1.sv_id.toString() === svId
+      ) {
         hasDiemPB = diemPB.sv1.tongDiem > 0 || diemPB.sv1.phanTichVanDe > 0;
-      } else if (diemPB.sv2 && diemPB.sv2.sv_id && diemPB.sv2.sv_id.toString() === svId) {
+      } else if (
+        diemPB.sv2 &&
+        diemPB.sv2.sv_id &&
+        diemPB.sv2.sv_id.toString() === svId
+      ) {
         hasDiemPB = diemPB.sv2.tongDiem > 0 || diemPB.sv2.phanTichVanDe > 0;
       }
     }
@@ -161,7 +174,9 @@ const form = async (req, res) => {
     const hasEvaluation = !!dg; // đã có đánh giá
 
     // DEBUG
-    console.log(`SV: ${svId}, hasDiemHD: ${hasDiemHD}, hasDiemPB: ${hasDiemPB}, isViewMode: ${isViewMode}`);
+    console.log(
+      `SV: ${svId}, hasDiemHD: ${hasDiemHD}, hasDiemPB: ${hasDiemPB}, isViewMode: ${isViewMode}`
+    );
 
     res.render("giangvien/pages/danhgiagk/form", {
       pageTitle: isViewMode
