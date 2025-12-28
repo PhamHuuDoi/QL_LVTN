@@ -7,6 +7,7 @@ const list = async (req, res) => {
       .populate({ path: "sv2", model: "Sinhvien" })
       .populate({ path: "giangvien_id", model: "Giangvien" })
       .lean();
+    
     // sắp xếp theo nhóm của sv1 hoặc sv2
     detais.sort((a, b) => {
       const groupA = a.sv1 ? a.sv1.group : (a.sv2 ? a.sv2.group : "");

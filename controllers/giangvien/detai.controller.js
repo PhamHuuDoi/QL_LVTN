@@ -7,11 +7,8 @@ const Docxtemplater = require("docxtemplater");
 const DeTai = require("../../models/detai.model");
 const SinhVien = require("../../models/sinhVien.model");
 
-
+const DanhGia = require("../../models/danhGiaGiuaKy.model"); 
 // LIST
-
-const DanhGia = require("../../models/danhGiaGiuaKy.model"); // THÊM DÒNG NÀY
-
 const list = async (req, res) => {
   try {
     let gvId = req.session.user?._id;
@@ -24,8 +21,9 @@ const list = async (req, res) => {
     const filter = req.query.filter || "all";
 
     // 1. Lấy tất cả sinh viên của giảng viên này
-    const svs = await SinhVien.find({ supervisor: gvId }).lean();
-
+    let svs = await SinhVien.find({ supervisor: gvId }).lean();
+    // Loại bỏ sinh viên không có nhóm
+    svs = svs.filter((sv) => sv.group && sv.group.trim() !== "");
     // 2. Nhóm sinh viên theo nhóm
     const groups = {};
     svs.forEach((sv) => {

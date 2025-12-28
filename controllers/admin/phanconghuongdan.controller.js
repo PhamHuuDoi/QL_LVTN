@@ -80,11 +80,17 @@ module.exports.assign = async (req, res) => {
       });
     }
 
-    // Lấy nhóm của sinh viên
-    const group = sv.group;
+    let svsInGroup = [];
+    let group = sv.group;
 
-    // Tìm tất cả sinh viên trong nhóm này
-    const svsInGroup = await SinhVien.find({ group }).populate("supervisor");
+    if (group && group.trim() !== "") {
+      //  Có nhóm → lấy theo nhóm
+      svsInGroup = await SinhVien.find({ group }).populate("supervisor");
+    } else {
+      //  Chưa có nhóm → phân công riêng SV này
+      svsInGroup = [sv];
+      group = null; // hoặc gán "single" nếu bạn muốn
+    }
 
     // Lấy giảng viên hiện tại của nhóm (nếu có)
     let currentGV = null;
@@ -111,20 +117,21 @@ module.exports.assign = async (req, res) => {
         hasDetai: true,
       });
     }
-
+    await SinhVien.updateMany(
+      { _id: { $in: svsInGroup.map((s) => s._id) } },
+      { supervisor: gvid }
+    );
     // Cập nhật supervisor cho tất cả sinh viên trong cùng nhóm
-    await SinhVien.updateMany({ group }, { supervisor: gvid });  
-    // Lưu cập nhật bảng phân công hướng dẫn cho từng SV trong nhóm
     for (let svItem of svsInGroup) {
       await PhanCongHuongDan.findOneAndUpdate(
-        { svid: svItem._id }, // nếu SV đã có phân công thì update
+        { svid: svItem._id },
         {
           gvid,
           svid: svItem._id,
-          group,
+          group: group || "", // nếu không có nhóm thì để rỗng
           trangthai: "Đang hướng dẫn",
         },
-        { upsert: true, new: true } // chưa có thì tạo mới
+        { upsert: true, new: true }
       );
     }
     // Cập nhật role giảng viên

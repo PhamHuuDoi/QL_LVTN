@@ -57,6 +57,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const chutichSelect = document.getElementById("chutichSelect");
   const thukySelect = document.getElementById("thukySelect");
 
+   const chutich = chutichSelect?.value;
+   const thuky = thukySelect?.value;
+
+   const uyvienSelects = wrapper.querySelectorAll(".uyvien-select");
+   const selectedUyviens = Array.from(uyvienSelects).map((s) => s.value);
+
+   
+
   // ===== Cập nhật ẩn option trùng =====
   function updateOptions() {
     const chutich = chutichSelect?.value;
@@ -64,7 +72,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const uyvienSelects = wrapper.querySelectorAll(".uyvien-select");
     const selectedUyviens = Array.from(uyvienSelects).map((s) => s.value);
+    // ===== Chủ tịch =====
+    if (chutichSelect) {
+      Array.from(chutichSelect.options).forEach((opt) => {
+        if (!opt.value) return;
+        opt.hidden = opt.value === thuky || selectedUyviens.includes(opt.value);
+      });
 
+      //  nếu đang trùng thì reset
+      if (chutich && (chutich === thuky || selectedUyviens.includes(chutich))) {
+        chutichSelect.value = "";
+      }
+    }
+
+    // ===== Thư ký =====
+    if (thukySelect) {
+      Array.from(thukySelect.options).forEach((opt) => {
+        if (!opt.value) return;
+        opt.hidden =
+          opt.value === chutich || selectedUyviens.includes(opt.value);
+      });
+
+      //  nếu đang trùng thì reset
+      if (thuky && (thuky === chutich || selectedUyviens.includes(thuky))) {
+        thukySelect.value = "";
+      }
+    }
     uyvienSelects.forEach((select) => {
       Array.from(select.options).forEach((opt) => {
         if (!opt.value) return;
