@@ -1,59 +1,110 @@
 extends ../../layouts/default.pug
 
 block main
-  .container.mt-4
-    h3.mb-3.text-primary Phân công phản biện
+  .container-fluid.mt-3
+    .d-flex.justify-content-between.align-items-center.mb-3
+      h4.mb-0 Phân công phản biện
+      .dropdown
+        button.btn.btn-outline-primary.btn-sm.dropdown-toggle(type="button" data-toggle="dropdown")
+          | Lọc
+        ul.dropdown-menu.dropdown-menu-right
+          li
+            a.dropdown-item(href="?filter=all") Tất cả
+          li
+            a.dropdown-item(href="?filter=yes") Đã phân công
+          li
+            a.dropdown-item(href="?filter=no") Chưa phân công
+          li
+            a.dropdown-item(href="?filter=hasDiemPB") Đã có điểm
+          li 
+            a.dropdown-item(href="?filter=noDiemPB") Chưa có điểm
+    
+    if detais.length
+      .table-responsive
+        table.table.table-bordered.table-sm.table-hover(style="min-width: 1000px; font-size: 0.9rem;")
+          thead.table-dark
+            tr
+              th.text-center(style="width: 60px") Nhóm
+              th(style="width: 130px") Tên SV1
+              th.text-center(style="width: 100px") MSSV1
+              th(style="width: 130px") Tên SV2
+              th.text-center(style="width: 100px") MSSV2
+              th(style="min-width: 180px") Đề tài
+              th(style="width: 150px") GVHD
+              th(style="width: 160px") GV phản biện
+              th.text-center(style="width: 100px") Trạng thái
 
-    table.table.table-bordered.table-hover
-      thead.table-dark
-        tr
-          th Nhóm
-          th Tên SV1
-          th MSSV1
-          th Tên SV2
-          th MSSV2
-          th Tên đề tài
-          th GVHD
-          th Giảng viên phản biện
-          th Trạng thái
+          tbody
+            each dt in detais
+              tr
+                // Nhóm
+                td.text-center
+                  strong #{dt.group || "—"}
+                  if dt.hasDiemPB
+                    small.d-block.text-danger Đã chấm
 
-      tbody
-        each dt in detais
-          tr
-            // Nhóm
-            td= dt.group || "—"
+                // SV1
+                td= dt.sv1 ? dt.sv1.ten : "—"
+                td.text-center= dt.sv1 ? dt.sv1.msvv : "—"
 
-            // SV1
-            td= dt.sv1 ? dt.sv1.ten : "—"
-            td= dt.sv1 ? dt.sv1.msvv : "—"
+                // SV2
+                td= dt.sv2 ? dt.sv2.ten : "—"
+                td.text-center= dt.sv2 ? dt.sv2.msvv : "—"
 
-            // SV2
-            td= dt.sv2 ? dt.sv2.ten : "—"
-            td= dt.sv2 ? dt.sv2.msvv : "—"
+                // Tên đề tài
+                td
+                  div(style="word-wrap: break-word;") #{dt.ten}
 
-            // Tên đề tài
-            td= dt.ten
+                // Giảng viên hướng dẫn
+                td= dt.giangvien_id ? dt.giangvien_id.hoten : "—"
 
-            // Giảng viên hướng dẫn
-            td= dt.giangvien_id ? dt.giangvien_id.hoten : "—"
+                // Giảng viên phản biện
+                td
+                  if dt.hasDiemPB
+                    select.form-select.form-select-sm(disabled title="Không thể thay đổi")
+                      option(value="", selected) 
+                        | #{dt.phanbien && dt.phanbien.gvphanbien_id ? dt.phanbien.gvphanbien_id.hoten : "—"}
+                  else if dt.phanbien && dt.phanbien.gvphanbien_id
+                    select.form-select.form-select-sm(onchange=`assignPB('${dt._id}', this.value)`)
+                      option(value="") -- Chọn --
+                      each gv in dt.availablePB
+                        option(
+                          value=gv._id
+                          selected=(dt.phanbien && gv._id.toString() === dt.phanbien.gvphanbien_id._id.toString())
+                        ) #{gv.hoten}
+                  else
+                    select.form-select.form-select-sm(onchange=`assignPB('${dt._id}', this.value)`)
+                      option(value="") -- Chọn --
+                      each gv in dt.availablePB
+                        option(value=gv._id) #{gv.hoten}
 
-            // Giảng viên phản biện (dropdown luôn hiển thị)
-            td
-              select.form-select(onchange=`assignPB('${dt._id}', this.value)`)
-                option(value="") -- Chọn giảng viên --
+                // Trạng thái
+                td.text-center
+                  if dt.hasDiemPB
+                    span.badge.bg-warning.badge-sm Đã có điểm
+                  else if dt.phanbien
+                    span.text-success Đã phân công
+                  else
+                    span.text-muted Chưa phân công
+    else
+      .text-center.py-4
+        p.text-muted.mb-0 Không có dữ liệu
 
-                each gv in dt.availablePB
-                  option(
-                    value=gv._id
-                    selected=(dt.phanbien && gv._id.toString() === dt.phanbien.gvphanbien_id._id.toString())
-                  ) #{gv.hoten} (#{gv.magv})
-
-            // Trạng thái
-            td
-              if dt.phanbien
-                span.text-success Đã phân công
-              else
-                span.text-muted Chưa phân công
+  style.
+    .table-responsive {
+      overflow-x: auto;
+    }
+    .table-sm th, .table-sm td {
+      padding: 0.4rem 0.3rem;
+    }
+    .badge-sm {
+      font-size: 0.75rem;
+      padding: 0.2rem 0.4rem;
+    }
+    .form-select-sm {
+      padding: 0.2rem 1.5rem 0.2rem 0.5rem;
+      font-size: 0.85rem;
+    }
 
   // Script xử lý phân công
   script.
@@ -83,6 +134,15 @@ block main
         await Swal.fire("Thành công", data.message, "success");
         location.reload();
       } else {
-        Swal.fire("Lỗi", data.message, "error");
+        if (data.hasDiemPB) {
+          Swal.fire({
+            title: "Không thể thay đổi!",
+            text: data.message,
+            icon: "error",
+            confirmButtonText: "Đã hiểu"
+          });
+        } else {
+          Swal.fire("Lỗi", data.message, "error");
+        }
       }
     }

@@ -12,14 +12,11 @@
 
       li
         a(href=`/${prefixAdmin}/detai`) Quản lý đề tài
-      li 
-        a(href=`/${prefixAdmin}/hoidong`) Quản lý hội đồng
-      li 
-        a(href=`/${prefixAdmin}/dsnhombv`) Phân công bảo vệ
+  
 
       //  Phân công
       li.menu-group
-        span Phân công
+        span Phân công ▼
         ul.sub-menu
           li
             a(href=`/${prefixAdmin}/phancong`) Phân công hướng dẫn
@@ -28,7 +25,7 @@
 
       //   Theo dõi tiến độ 
       li.menu-group
-        span Theo dõi tiến độ
+        span Theo dõi tiến độ ▼
         ul.sub-menu
           li
             a(href=`/${prefixAdmin}/danhgiagk`) Đánh giá giữa kỳ
@@ -36,5 +33,12 @@
             a(href=`/${prefixAdmin}/theodoidiemhd`) Theo dõi điểm hướng dẫn
           li
             a(href=`/${prefixAdmin}/theodoidiempb`) Theo dõi điểm phản biện
+      li.menu-group
+        span Hội đồng ▼
+        ul.sub-menu
+              li 
+                a(href=`/${prefixAdmin}/hoidong`) Quản lý hội đồng
+              li 
+                a(href=`/${prefixAdmin}/dsnhombv`) Phân công bảo vệ
       li 
         a(href=`/${prefixAdmin}/ketqua`) Quản lý kết quả

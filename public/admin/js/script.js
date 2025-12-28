@@ -20,9 +20,34 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 
-document.querySelectorAll(".menu-group > span").forEach((el) => {
-  el.addEventListener("click", () => {
-    el.nextElementSibling.classList.toggle("open");
+document.addEventListener("DOMContentLoaded", function () {
+  // Xử lý toggle menu group
+  document.querySelectorAll(".menu-group > span").forEach((el) => {
+    el.addEventListener("click", () => {
+      el.nextElementSibling.classList.toggle("open");
+    });
+  });
+
+  // Tự động mở sub-menu nếu link con đang active
+  document.querySelectorAll(".sub-menu a").forEach((link) => {
+    if (
+      link.classList.contains("active") ||
+      link.href === window.location.href
+    ) {
+      link.classList.add("active");
+      const subMenu = link.closest(".sub-menu");
+      if (subMenu) {
+        subMenu.classList.add("open");
+      }
+    }
+  });
+
+  // Thêm class active cho link hiện tại
+  const currentPath = window.location.pathname;
+  document.querySelectorAll(".inner-menu a[href]").forEach((link) => {
+    if (link.getAttribute("href") === currentPath) {
+      link.classList.add("active");
+    }
   });
 });
 // Add thêm ủy

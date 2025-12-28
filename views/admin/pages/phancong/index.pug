@@ -1,39 +1,106 @@
 extends ../../layouts/default.pug
 
 block main
-  .container
-    h3.mb-3 Phân công hướng dẫn
-    table.table.table-bordered
-      thead.table-dark
-        tr
-          th Mã SV
-          th Tên
-          th Nhóm
-          th Giảng viên hướng dẫn
-          th Thao tác
-      tbody
-        each sv in sinhviens
-          tr
-            td= sv.msvv
-            td= sv.ten
-            td= sv.group
-            td
-              select.form-select(onchange=`phanCong('${sv._id}', this.value)`)
-                option(value="") -- Chọn giảng viên --
-                each gv in giangviens
-                  option(
-                    value=gv._id
-                    selected=(sv.supervisor && sv.supervisor._id.toString() === gv._id.toString())
-                  )= gv.hoten
-            td
-              if sv.supervisor
-                span.text-success Đã phân công
-              else
-                span.text-muted Chưa phân công
+  .container-fluid.mt-3
+    .d-flex.justify-content-between.align-items-center.mb-3
+      h4.mb-0 Phân công hướng dẫn
+      .dropdown
+        button.btn.btn-outline-primary.btn-sm.dropdown-toggle(type="button" data-toggle="dropdown")
+          | Lọc
+        .dropdown-menu.dropdown-menu-right
+          a.dropdown-item(href="?filter=all") Tất cả
+          a.dropdown-item(href="?filter=yes") Đã phân công
+          a.dropdown-item(href="?filter=no") Chưa phân công
+          a.dropdown-item(href="?filter=hasDetai") Đã có đề tài
+          a.dropdown-item(href="?filter=noDetai") Chưa có đề tài
+    
+    if sinhviens.length
+      .card
+        .card-body.p-0
+          .table-responsive
+            table.table.table-bordered.table-sm.table-hover.mb-0(style="font-size: 0.9rem;")
+              thead.table-dark
+                tr
+                  th.text-center(style="width: 100px") Mã SV
+                  th(style="min-width: 150px") Tên
+                  th.text-center(style="width: 80px") Nhóm
+                  th.text-center(style="width: 120px") Trạng thái
+                  th.text-center(style="min-width: 200px") Giảng viên hướng dẫn
+              tbody
+                each sv in sinhviens
+                  tr
+                    td.text-center= sv.msvv
+                    td= sv.ten
+                    td.text-center
+                      strong #{sv.group}
+                      if sv.hasDetai
+                        small.d-block.text-danger Đã có đề tài
+                    td.text-center
+                      if sv.hasDetai
+                        span.badge.bg-warning.badge-sm Đã có đề tài
+                      else if sv.supervisor
+                        span.badge.bg-success.badge-sm Đã phân công
+                      else
+                        span.badge.bg-secondary.badge-sm Chưa phân công
+                    td.text-center
+                      .d-flex.justify-content-center
+                        if sv.hasDetai
+                          select.form-select.form-select-sm(disabled title="Không thể thay đổi vì đã có đề tài" style="max-width: 250px;")
+                            option(value="", selected) 
+                              | #{sv.supervisor ? sv.supervisor.hoten : "Chưa phân công"}
+                        else
+                          select.form-select.form-select-sm(onchange=`phanCong('${sv._id}', this.value)` style="max-width: 250px;")
+                            option(value="") -- Chọn --
+                            each gv in giangviens
+                              option(
+                                value=gv._id
+                                selected=(sv.supervisor && sv.supervisor._id.toString() === gv._id.toString())
+                              )= gv.hoten
+    else
+      .text-center.py-4
+        p.text-muted.mb-0 Không có sinh viên nào
+
+  style.
+    .table-responsive {
+      overflow-x: auto;
+      border-radius: 4px;
+    }
+    .table {
+      width: 100%;
+      margin-bottom: 0;
+    }
+    .table-sm th, .table-sm td {
+      padding: 0.5rem 0.5rem;
+      vertical-align: middle;
+    }
+    .table-dark th {
+      background-color: #343a40;
+      border-color: #454d55;
+    }
+    .badge-sm {
+      font-size: 0.75rem;
+      padding: 0.2rem 0.4rem;
+    }
+    .form-select-sm {
+      padding: 0.25rem 1.5rem 0.25rem 0.5rem;
+      font-size: 0.85rem;
+      min-height: calc(1.5em + 0.5rem + 2px);
+    }
+    .dropdown-menu {
+      min-width: 150px;
+    }
+    .card {
+      border: 1px solid #dee2e6;
+      border-radius: 0.375rem;
+    }
+    td.text-center .d-flex {
+      display: flex !important;
+    }
 
   script.
     async function phanCong(svid, gvid) {
       if (!gvid) return;
+      
       const confirm = await Swal.fire({
         title: "Xác nhận phân công?",
         text: "Toàn bộ sinh viên cùng nhóm sẽ được gán giảng viên này.",
@@ -48,14 +115,27 @@ block main
       const res = await fetch("/admin/phancong/assign", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ svid, gvid })
+        body: JSON.stringify({ 
+          svid, 
+          gvid
+        })
       });
 
       const data = await res.json();
+      
       if (data.success) {
         await Swal.fire("Thành công", data.message, "success");
         location.reload();
       } else {
-        Swal.fire("Lỗi", data.message, "error");
+        if (data.hasDetai) {
+          Swal.fire({
+            title: "Không thể thay đổi!",
+            text: data.message,
+            icon: "error",
+            confirmButtonText: "Đã hiểu"
+          });
+        } else {
+          Swal.fire("Lỗi", data.message, "error");
+        }
       }
     }
