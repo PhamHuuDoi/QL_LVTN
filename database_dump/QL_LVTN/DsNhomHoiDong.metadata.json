@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"},{"v":{"$numberInt":"2"},"key":{"sv1":{"$numberInt":"1"},"sv2":{"$numberInt":"1"}},"name":"sv1_1_sv2_1","background":true,"unique":true}],"uuid":"a54635f67fae4a5cb003270a095b12d3","collectionName":"DsNhomHoiDong","type":"collection"}

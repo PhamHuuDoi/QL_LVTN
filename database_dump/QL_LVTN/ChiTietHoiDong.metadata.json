@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"},{"v":{"$numberInt":"2"},"key":{"hoidong_id":{"$numberInt":"1"},"gv_id":{"$numberInt":"1"}},"name":"hoidong_id_1_gv_id_1","background":true,"unique":true}],"uuid":"2f33eda2e15c4ceeadc08c9bad9427d3","collectionName":"ChiTietHoiDong","type":"collection"}
